@@ -32,3 +32,6 @@ class Minerals:
         print(Mineral.diamond.code) # 0
         print(Mineral.diamond.description) # Diamond
         print(Mineral.diamond.score_value) # 100000 """
+
+NumPlayerMoves = 3
+
