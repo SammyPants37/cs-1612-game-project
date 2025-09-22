@@ -1,5 +1,6 @@
 import random
 from Constants import Minerals
+import Constants
 
 # rest of code goes here
 
@@ -33,4 +34,16 @@ def handleInput(input: str):
             pass
         case _:
             print(f"mine game: {command}: not found.")
+
+
+running = True
+
+# game loop
+while running:
+    # run player moves
+    for turn in range(Constants.NumPlayerMoves):
+        command = input(">>> ")
+        handleInput(command)
+
+    # TODO: add event generator when done
 
