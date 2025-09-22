@@ -5,6 +5,7 @@ import Constants
 # rest of code goes here
 
 def handleInput(input: str):
+    global running
     command = input.split(" ")[0].lower().strip()
     arguments = input.split(" ").pop(0) # args will be passed to each command when they're implimented
     match command:
@@ -30,8 +31,7 @@ def handleInput(input: str):
             # TODO: add fight function when implimented
             pass
         case "exit" | "e":
-            # TODO: add quit function when implimented
-            pass
+            running = False
         case _:
             print(f"mine game: {command}: not found.")
 
