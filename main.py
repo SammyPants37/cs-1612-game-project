@@ -1,7 +1,5 @@
 import random
 from Constants import Minerals
-from Constants import event_number_scaler
-from Constants import DenominatorEventsOccur
 import Constants
 
 # rest of code goes here
@@ -18,16 +16,15 @@ class Events: #calculates if an event has will occur based on the number of days
         self.occurred_daily = 0
 
     def occurrence_probability(self):
-        number_of_events = event_number_scaler(Day.counter) #sets number of events equal to the number off our formula
+        number_of_events = Constants.event_number_scaler(Day.counter) #sets number of events equal to the number off our formula
         while number_of_events > 0: #while potential events haven't occurred
-            event_occurred = random.randint(1,DenominatorEventsOccur) # DEO = 6
+            event_occurred = random.randint(1,Constants.DenominatorEventsOccur) # DEO = 6
             if event_occurred == 1: # 1/6 chance of occurring
                 self.occurred_daily += 1
             number_of_events -= 1
-            # insert function here that picks the event that would occur (which leads to the specific event's output)
+            # TODO: insert function here that picks the event that would occur (which leads to the specific event's output)
             self.occurred_daily = 0 # placement depends on how above function operates
         # self.occurred_daily # could technically be here too
-        #  # test, *not here but need to include at end of turn loop
 Events = Events()
 
 def handleInput(input: str):
