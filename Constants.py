@@ -37,4 +37,5 @@ class Minerals:
         print(Mineral.diamond.score_value) # 100000 """
 
 NumPlayerMoves = 3
+DenominatorEventsOccur = 6 # in case we would like to change the 1/6th chance they occur separately
 
