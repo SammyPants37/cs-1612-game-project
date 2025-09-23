@@ -2,6 +2,9 @@ from enum import Enum
 
 #Below is where we will import our constant values
 
+def event_number_scaler(x): #current formula for scaling how many events will have a 1/6th chance of occurring
+    return int((1 / 50) * x ** 2 + 1)
+
 class Minerals:
     tile_amount = 24  # amount of mineral tiles on the board
     weights = [1, 4, 5, 6, 8, 17, 18, 30, 40, 50, 110, 200]  # weights ordered from least to most common
@@ -34,4 +37,5 @@ class Minerals:
         print(Mineral.diamond.score_value) # 100000 """
 
 NumPlayerMoves = 3
+DenominatorEventsOccur = 6 # in case we would like to change the 1/6th chance they occur separately
 
