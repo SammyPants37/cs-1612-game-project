@@ -24,7 +24,7 @@ class Minerals:
         iron = (9, "Iron", 1750)
         copper = (10, "Copper", 750)
         coal = (11, "Coal", 250)
-        monsterDen = (12, "Maulwurth Egg", 6000)
+        monsterDen = (12, "Maulwurf Egg", 6000)
 
         # expanding on an Enum with a __init__ allows more than value and name to be associated with a variable
         def __init__(self, code, description, score_value):
