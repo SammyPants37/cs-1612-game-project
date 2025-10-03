@@ -30,30 +30,37 @@ Events = Events()
 def handleInput(input: str):
     global running
     command = input.split(" ")[0].lower().strip()
-    arguments = input.split(" ").pop(0) # args will be passed to each command when they're implimented
+    arguments = input.split(" ").pop(0) # args will be passed to each command when they're implemented
     match command:
-        case "start" | "s":
-            # TODO: add run function when implimented
+        case "rules" | "r":
+            # TODO: add rules function when implemented
+            pass
+        case "objective" | "lore" | "o" | "l":
+            # TODO: add objective defining function when implemented
             pass
         case "move":
-            # TODO: add move function when implimented
+            # TODO: add move function when implemented, make sure to include the cardinal directions
             pass
         case "mine" | "m":
-            # TODO: add mine function when implimented
+            # TODO: add mine function when implemented
             pass
         case "inspect" | "i":
-            # TODO: add inspect function when implimented
+            # TODO: add inspect function when implemented
             pass
-        case "grab" | "g":
-            # TODO: add grab function when implimented
+        case "compass" | "map" | "check" | "c":
+            # TODO: add map and compass function when implemented
+            pass
+        case "grab" | "pick" | "g" | "p":
+            # TODO: add grab function when implemented
             pass
         case "dynamite" | "d":
-            # TODO: add dynamite (remove caved in tile) function when implimented
+            # TODO: add dynamite (remove caved in tile) function when implemented
             pass
-        case "fight" | "f" | "battle" | "b" | "kill":
-            # TODO: add fight function when implimented
+        case "weapon" | "fight" | "f" | "battle" | "b" | "kill":
+            # TODO: add fight function when implemented
             pass
-        case "exit" | "e":
+        case "quit" | "q":
+            # TODO: make a confirmation for quitting the game
             running = False
         case _:
             print(f"mine game: {command}: not found.")
