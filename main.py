@@ -1,15 +1,10 @@
 import random
 from Constants import Minerals
 import Constants
+import Tile, Player
 
 # rest of code goes here
 
-class Day: #used to count the number of days that have passed
-    def __init__(self):
-        self.counter = 0
-    def count_increase(self):
-        self.counter += 1
-Day = Day()
 
 class Events: #calculates if an event has will occur based on the number of days passed
     def __init__(self):
@@ -26,6 +21,20 @@ class Events: #calculates if an event has will occur based on the number of days
             self.occurred_daily = 0 # placement depends on how above function operates
         # self.occurred_daily # could technically be here too
 Events = Events()
+
+
+def generateMap() -> list[list[Tile.Tile]]:
+    map:list[list[Tile.Tile]] = []
+    for h in range(Constants.mapHeight):
+        map[h] = []
+        for w in range(Constants.mapWidth):
+            map[h][w] = Tile.Tile((w, h), random.choice(list(Minerals.mineralTypes), Minerals.weights), False)
+            map[h][w].setItem(random.choice(list(Constants.Items), [290, 5, 5]))
+    map[Constants.mapHeight-1][random.randint(0, Constants.mapWidth-1)].isExit = True
+    playerX = random.randint(0, Constants.mapWidth-1)
+    map[0][playerX] = Player.Player((playerX, 0))
+    return map
+
 
 def handleInput(input: str):
     global running
@@ -66,7 +75,11 @@ def handleInput(input: str):
             print(f"mine game: {command}: not found.")
 
 
+# beginning of game code
+daysPassed = 0
+map = generateMap()
 running = True
+
 
 # game loop
 while running:
