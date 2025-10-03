@@ -36,12 +36,6 @@ def generateMap() -> list[list[Tile.Tile]]:
     return map
 
 
-
-# beginning of game code
-daysPassed = 0
-map = generateMap()
-
-
 def handleInput(input: str):
     global running
     command = input.split(" ")[0].lower().strip()
@@ -81,7 +75,11 @@ def handleInput(input: str):
             print(f"mine game: {command}: not found.")
 
 
+# beginning of game code
+daysPassed = 0
+map = generateMap()
 running = True
+
 
 # game loop
 while running:
