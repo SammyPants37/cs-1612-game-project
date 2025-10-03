@@ -11,7 +11,7 @@ class Events: #calculates if an event has will occur based on the number of days
         self.occurred_daily = 0
 
     def occurrence_probability(self):
-        number_of_events = Constants.event_number_scaler(Day.counter) #sets number of events equal to the number off our formula
+        number_of_events = Constants.event_number_scaler(daysPassed) #sets number of events equal to the number off our formula
         while number_of_events > 0: #while potential events haven't occurred
             event_occurred = random.randint(1,Constants.DenominatorEventsOccur) # DEO = 6
             if event_occurred == 1: # 1/6 chance of occurring
@@ -69,8 +69,13 @@ def handleInput(input: str):
             # TODO: add fight function when implemented
             pass
         case "quit" | "q":
-            # TODO: make a confirmation for quitting the game
-            running = False
+            match arguments:
+                case "game" | "quit" | "yes" | "y" | "q":
+                    print("Thank you for playing Zwerg. Goodbye!")
+                    running = False
+                case _:
+                    print("Are you sure you would like to quit? Progress will not be saved...\n(Please type in Quit Game to confirm).")
+
         case _:
             print(f"mine game: {command}: not found.")
 
@@ -89,6 +94,6 @@ while running:
         handleInput(command)
 
     Events.occurrence_probability()
-    Day.count_increase()
+    daysPassed += 1
     # TODO: add event generator when done
 
