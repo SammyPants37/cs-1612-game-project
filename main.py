@@ -49,7 +49,9 @@ def showMap(map: list[list[Tile.Tile]]) -> None:
 def handleInput(input: str):
     global running
     command = input.split(" ")[0].lower().strip()
-    arguments = input.split(" ").pop(0) # args will be passed to each command when they're implemented
+    arguments = input.split(" ")[1:] # args will be passed to each command when they're implemented
+    print(command)
+    print(arguments)
     match command:
         case "rules" | "r":
             # TODO: add rules function when implemented
@@ -78,13 +80,11 @@ def handleInput(input: str):
             # TODO: add fight function when implemented
             pass
         case "quit" | "q":
-            match arguments:
-                case "game" | "quit" | "yes" | "y" | "q":
-                    print("Thank you for playing Zwerg. Goodbye!")
-                    running = False
-                case _:
-                    print("Are you sure you would like to quit? Progress will not be saved...\n(Please type in Quit Game to confirm).")
-
+            if not set(arguments).isdisjoint(["quit", "yes", "y", "q", "game"]):
+                print("Thank you for playing Zwerg. Goodbye!")
+                running = False
+            else:
+                print("Are you sure you would like to quit? Progress will not be saved...\n(Please type in Quit Game to confirm).")
         case _:
             print(f"mine game: {command}: not found.")
 
@@ -102,6 +102,8 @@ while running:
     for turn in range(Constants.NumPlayerMoves):
         command = input(">>> ")
         handleInput(command)
+        if not running:
+            break
 
     occurrence_probability(daysPassed)
     daysPassed += 1
