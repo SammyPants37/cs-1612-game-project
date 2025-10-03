@@ -1,21 +1,21 @@
 import Constants
-from Constants import Minerals, ItemLimit
+from Constants import Minerals, ItemLimit, Items
 
 class Player:
 
     def __init__(self, startingPos):
-        self.total_score = 0
-        self.items = []
-        self.minerals_in_bag = []
+        self.total_score: int = 0
+        self.items: list[Items] = []
+        self.minerals_in_bag: list[Minerals.mineralTypes] = []
         self.pos = startingPos
 
-    def add_score(self, new_mineral):
-        self.minerals_in_bag.append(new_mineral.description) #adds mineral to bag
+    def add_score(self, new_mineral: Minerals.mineralTypes):
+        self.minerals_in_bag.append(new_mineral) #adds mineral to bag
         self.total_score += new_mineral.score_value #adds mineral's score to total
 
-    def grab_item(self, new_item):
+    def grab_item(self, new_item: Items):
         if len(self.items) < Constants.ItemLimit: #if the amount of items in the list is less than 3
-            self.items.append(list(new_item)) #just add it to the list
+            self.items.append(new_item) #just add it to the list
             # TODO: add function that changes tile to no items
         else:
             for i in range(len(self.items)):
