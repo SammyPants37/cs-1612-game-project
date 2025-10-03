@@ -10,8 +10,8 @@ class Events: #calculates if an event has will occur based on the number of days
     def __init__(self):
         self.occurred_daily = 0
 
-    def occurrence_probability(self):
-        number_of_events = Constants.event_number_scaler(Day.counter) #sets number of events equal to the number off our formula
+    def occurrence_probability(self, numDays: int):
+        number_of_events = Constants.event_number_scaler(numDays) #sets number of events equal to the number off our formula
         while number_of_events > 0: #while potential events haven't occurred
             event_occurred = random.randint(1,Constants.DenominatorEventsOccur) # DEO = 6
             if event_occurred == 1: # 1/6 chance of occurring
@@ -20,19 +20,20 @@ class Events: #calculates if an event has will occur based on the number of days
             # TODO: insert function here that picks the event that would occur (which leads to the specific event's output)
             self.occurred_daily = 0 # placement depends on how above function operates
         # self.occurred_daily # could technically be here too
-Events = Events()
+events = Events()
 
 
 def generateMap() -> list[list[Tile.Tile]]:
+    global player
     map:list[list[Tile.Tile]] = []
     for h in range(Constants.mapHeight):
-        map[h] = []
+        map.append([])
         for w in range(Constants.mapWidth):
-            map[h][w] = Tile.Tile((w, h), random.choice(list(Minerals.mineralTypes), Minerals.weights), False)
-            map[h][w].setItem(random.choice(list(Constants.Items), [290, 5, 5]))
+            map[h].append(Tile.Tile((w, h), random.choices(list(Minerals.mineralTypes), weights=Minerals.weights)[0], False))
+            map[h][w].setItem(random.choices(list(Constants.Items), weights=[290, 5, 5])[0])
     map[Constants.mapHeight-1][random.randint(0, Constants.mapWidth-1)].isExit = True
     playerX = random.randint(0, Constants.mapWidth-1)
-    map[0][playerX] = Player.Player((playerX, 0))
+    player = Player.Player((playerX, 0))
     return map
 
 
@@ -77,6 +78,7 @@ def handleInput(input: str):
 
 # beginning of game code
 daysPassed = 0
+player: Player.Player
 map = generateMap()
 running = True
 
@@ -88,7 +90,7 @@ while running:
         command = input(">>> ")
         handleInput(command)
 
-    Events.occurrence_probability()
-    Day.count_increase()
+    events.occurrence_probability(daysPassed)
+    daysPassed += 1
     # TODO: add event generator when done
 
