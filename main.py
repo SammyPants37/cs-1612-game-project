@@ -5,22 +5,15 @@ import Tile, Player
 
 # rest of code goes here
 
-
-class Events: #calculates if an event has will occur based on the number of days passed
-    def __init__(self):
-        self.occurred_daily = 0
-
-    def occurrence_probability(self, numDays: int):
-        number_of_events = Constants.event_number_scaler(numDays) #sets number of events equal to the number off our formula
-        while number_of_events > 0: #while potential events haven't occurred
-            event_occurred = random.randint(1,Constants.DenominatorEventsOccur) # DEO = 6
-            if event_occurred == 1: # 1/6 chance of occurring
-                self.occurred_daily += 1
-            number_of_events -= 1
-            # TODO: insert function here that picks the event that would occur (which leads to the specific event's output)
-            self.occurred_daily = 0 # placement depends on how above function operates
-        # self.occurred_daily # could technically be here too
-events = Events()
+def occurrence_probability(numDays: int):
+    possibleEvents = Constants.event_number_scaler(numDays) #sets number of events equal to the number off our formula
+    numEvents = 0
+    while possibleEvents > 0: #while potential events haven't occurred
+        event_occurred = random.randint(1,Constants.DenominatorEventsOccur) # DEO = 6
+        if event_occurred == 1: # 1/6 chance of occurring
+            numEvents += 1
+        possibleEvents -= 1
+        # TODO: insert function here that picks the event that would occur (which leads to the specific event's output)
 
 
 def generateMap() -> list[list[Tile.Tile]]:
@@ -37,10 +30,28 @@ def generateMap() -> list[list[Tile.Tile]]:
     return map
 
 
+def showMap(map: list[list[Tile.Tile]]) -> None:
+    workingRow = 0
+    for row in map:
+        line = ""
+        for item in row:
+            if item.pos == player.pos:
+                line += "P "
+            else:
+                line += str(item) + " "
+        if workingRow  < len(Constants.mapExtras):
+            line += Constants.mapExtras[workingRow]
+        print(line)
+        workingRow += 1
+            
+
+
 def handleInput(input: str):
     global running
     command = input.split(" ")[0].lower().strip()
-    arguments = input.split(" ").pop(0) # args will be passed to each command when they're implemented
+    arguments = input.split(" ")[1:] # args will be passed to each command when they're implemented
+    print(command)
+    print(arguments)
     match command:
         case "rules" | "r":
             # TODO: add rules function when implemented
@@ -58,8 +69,7 @@ def handleInput(input: str):
             # TODO: add inspect function when implemented
             pass
         case "compass" | "map" | "check" | "c":
-            # TODO: add map and compass function when implemented
-            pass
+            showMap(map)
         case "grab" | "pick" | "g" | "p":
             # TODO: add grab function when implemented
             pass
@@ -70,13 +80,11 @@ def handleInput(input: str):
             # TODO: add fight function when implemented
             pass
         case "quit" | "q":
-            match arguments:
-                case "game" | "quit" | "yes" | "y" | "q":
-                    print("Thank you for playing Zwerg. Goodbye!")
-                    running = False
-                case _:
-                    print("Are you sure you would like to quit? Progress will not be saved...\n(Please type in Quit Game to confirm).")
-
+            if not set(arguments).isdisjoint(["quit", "yes", "y", "q", "game"]):
+                print("Thank you for playing Zwerg. Goodbye!")
+                running = False
+            else:
+                print("Are you sure you would like to quit? Progress will not be saved...\n(Please type in Quit Game to confirm).")
         case _:
             print(f"mine game: {command}: not found.")
 
@@ -94,8 +102,10 @@ while running:
     for turn in range(Constants.NumPlayerMoves):
         command = input(">>> ")
         handleInput(command)
+        if not running:
+            break
 
-    events.occurrence_probability(daysPassed)
+    occurrence_probability(daysPassed)
     daysPassed += 1
     # TODO: add event generator when done
 

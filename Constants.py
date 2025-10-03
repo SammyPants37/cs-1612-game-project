@@ -46,6 +46,17 @@ class Items(Enum):
     dynamite = 1
     weapon = 2
 
+
+mapExtras = [
+    "	Legend:",
+    "	?: unexplored tile		    N",
+    "	_: unmineable tile		    ᐃ",
+    "	#: caved in tile		W ᐊ ⚪ ᐅ E",
+    "	P: player			    ᐁ",
+    "	O: mineral tile			    S",
+    "	E: exit/escape tile		",
+    "	M: monster infested tile",
+    "	D: monster den tile		"]
         
 
 mapWidth = 25
