@@ -70,8 +70,13 @@ def handleInput(input: str):
             # TODO: add fight function when implemented
             pass
         case "quit" | "q":
-            # TODO: make a confirmation for quitting the game
-            running = False
+            match arguments:
+                case "game" | "quit" | "yes" | "y" | "q":
+                    print("Thank you for playing Zwerg. Goodbye!")
+                    running = False
+                case _:
+                    print("Are you sure you would like to quit? Progress will not be saved...\n(Please type in Quit Game to confirm).")
+
         case _:
             print(f"mine game: {command}: not found.")
 
