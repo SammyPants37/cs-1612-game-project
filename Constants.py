@@ -2,7 +2,7 @@ from enum import Enum
 
 #Below is where we will import our constant values
 
-def event_number_scaler(x): #current formula for scaling how many events will have a 1/6th chance of occurring
+def event_number_scaler(x: int) -> int: #current formula for scaling how many events will have a 1/6th chance of occurring
     return int((1 / 50) * x ** 2 + 1)
 
 class Minerals:
