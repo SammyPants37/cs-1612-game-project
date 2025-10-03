@@ -3,10 +3,11 @@ from Constants import Minerals, ItemLimit
 
 class Player:
 
-    def __init__(self):
+    def __init__(self, startingPos):
         self.total_score = 0
         self.items = []
         self.minerals_in_bag = []
+        self.pos = startingPos
 
     def add_score(self, new_mineral):
         self.minerals_in_bag.append(new_mineral.description) #adds mineral to bag
@@ -24,5 +25,6 @@ class Player:
                     break #then stop looking
                 #if all the items are the same as you are picking up nothing happens
 
-
+    def setPos(self, pos):
+        self.pos = pos
 
