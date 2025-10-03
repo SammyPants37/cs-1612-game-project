@@ -7,11 +7,11 @@ def event_number_scaler(x): #current formula for scaling how many events will ha
 
 class Minerals:
     tile_amount = 24  # amount of mineral tiles on the board
-    weights = [1, 4, 5, 6, 8, 17, 18, 30, 40, 50, 110, 200]  # weights ordered from least to most common
+    weights = [1, 4, 5, 6, 8, 17, 18, 30, 40, 50, 110, 200, 9]  # weights ordered from least to most common
     codes = list(range(12))  # creates a list of values from 0 to 11, corresponding to each mineral
 
     # Enum classes allow the value and name of a function to be used in place of a function
-    class Enum(Enum):
+    class mineralTypes(Enum):
         unminable = (0, "{Worthless Rock}", 0)
         diamond = (1, "Diamond", 100000)
         ruby = (2, "Ruby", 85000)
@@ -24,6 +24,7 @@ class Minerals:
         iron = (9, "Iron", 1750)
         copper = (10, "Copper", 750)
         coal = (11, "Coal", 250)
+        monsterDen = (12, "Maulwurth Egg", 6000)
 
         # expanding on an Enum with a __init__ allows more than value and name to be associated with a variable
         def __init__(self, code, description, score_value):
@@ -38,4 +39,14 @@ class Minerals:
 
 NumPlayerMoves = 3
 DenominatorEventsOccur = 6 # in case we would like to change the 1/6th chance they occur separately
+
+class Items(Enum):
+    nothing = 0
+    dynamite = 1
+    weapon = 2
+
+        
+
+mapWidth = 25
+mapHeight = 25
 
