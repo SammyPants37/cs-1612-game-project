@@ -50,8 +50,8 @@ def handleInput(input: str):
     global running
     command = input.split(" ")[0].lower().strip()
     arguments = input.split(" ")[1:] # args will be passed to each command when they're implemented
-    print(command)
-    print(arguments)
+    # print(command)
+    # print(arguments)
     match command:
         case "rules" | "r":
             # TODO: add rules function when implemented
@@ -79,7 +79,7 @@ def handleInput(input: str):
         case "weapon" | "fight" | "f" | "battle" | "b" | "kill":
             # TODO: add fight function when implemented
             pass
-        case "quit" | "q":
+        case "quit" | "q" | "exit":
             if not set(arguments).isdisjoint(["quit", "yes", "y", "q", "game"]):
                 print("Thank you for playing Zwerg. Goodbye!")
                 running = False
