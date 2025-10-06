@@ -8,11 +8,11 @@ def event_number_scaler(x: int) -> int: #current formula for scaling how many ev
 class Minerals:
     tile_amount = 24  # amount of mineral tiles on the board
     weights = [1, 4, 5, 6, 8, 17, 18, 30, 40, 50, 110, 200, 9]  # weights ordered from least to most common
-    codes = list(range(12))  # creates a list of values from 0 to 11, corresponding to each mineral
+    codes = list(range(12))  # creates a list of values from 0 to 12, corresponding to each mineral + monster den
 
     # Enum classes allow the value and name of a function to be used in place of a function
     class mineralTypes(Enum):
-        unminable = (0, "{Worthless Rock}", 0)
+        unminable = (0, "Worthless Rock", 0)
         diamond = (1, "Diamond", 100000)
         ruby = (2, "Ruby", 85000)
         emerald = (3, "Emerald", 65000)
@@ -31,11 +31,11 @@ class Minerals:
             self.code = code
             self.description = description
             self.score_value = score_value
-            """ print(Mineral.diamond.name) # diamond
-        print(Mineral.diamond.value) # (0, 'Diamond', 100000)
-        print(Mineral.diamond.code) # 0
-        print(Mineral.diamond.description) # Diamond
-        print(Mineral.diamond.score_value) # 100000 """
+            """ print(Minerals.mineralTypes.diamond.name) # diamond
+            print(Minerals.mineralTypes.diamond.value) # (0, "Diamond", 100000)
+            print(Minerals.mineralTypes.diamond.code) # 0
+            print(Minerals.mineralTypes.diamond.description) # Diamond
+            print(Minerals.mineralTypes.diamond.score_value) # 100000 """
 
 ItemLimit = 3
 NumPlayerMoves = 3

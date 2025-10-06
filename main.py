@@ -1,7 +1,6 @@
 import random
 from Constants import Minerals
-import Constants
-import Tile, Player
+import Constants, Tile, Player
 
 # rest of code goes here
 
@@ -60,9 +59,11 @@ def handleInput(input: str):
             # TODO: add objective defining function when implemented
             pass
         case "move":
+            # Player.actions_left -= 1
             # TODO: add move function when implemented, make sure to include the cardinal directions
             pass
         case "mine" | "m":
+            # Player.actions_left -= 1
             # TODO: add mine function when implemented
             pass
         case "inspect" | "i":
@@ -74,9 +75,11 @@ def handleInput(input: str):
             # TODO: add grab function when implemented
             pass
         case "dynamite" | "d":
+            # Player.actions_left -= 2
             # TODO: add dynamite (remove caved in tile) function when implemented
             pass
         case "weapon" | "fight" | "f" | "battle" | "b" | "kill":
+            # Player.actions_left -= 2
             # TODO: add fight function when implemented
             pass
         case "quit" | "q":
@@ -98,8 +101,9 @@ running = True
 
 # game loop
 while running:
+    Player.actions_left += Constants.NumPlayerMoves #refunds 3 actions
     # run player moves
-    for turn in range(Constants.NumPlayerMoves):
+    while Player.actions_left > 0:
         command = input(">>> ")
         handleInput(command)
         if not running:

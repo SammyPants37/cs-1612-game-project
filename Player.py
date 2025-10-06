@@ -1,6 +1,5 @@
 import Constants
 from Constants import Minerals, ItemLimit, Items
-
 class Player:
 
     def __init__(self, startingPos):
@@ -27,4 +26,6 @@ class Player:
 
     def setPos(self, pos):
         self.pos = pos
+
+actions_left = 0
 
