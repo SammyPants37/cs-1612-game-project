@@ -1,7 +1,6 @@
 import random
 from Constants import Minerals
-import Constants
-import Tile, Player
+import Constants, Tile, Player
 
 # rest of code goes here
 
@@ -26,7 +25,7 @@ def generateMap() -> list[list[Tile.Tile]]:
             map[h][w].setItem(random.choices(list(Constants.Items), weights=[290, 5, 5])[0])
     map[Constants.mapHeight-1][random.randint(0, Constants.mapWidth-1)].isExit = True
     playerX = random.randint(0, Constants.mapWidth-1)
-    player = Player.Player((playerX, 0))
+    player.setPos((playerX, 0))
     return map
 
 
@@ -50,8 +49,6 @@ def handleInput(input: str):
     global running
     command = input.split(" ")[0].lower().strip()
     arguments = input.split(" ")[1:] # args will be passed to each command when they're implemented
-    print(command)
-    print(arguments)
     match command:
         case "rules" | "r":
             # TODO: add rules function when implemented
@@ -60,9 +57,11 @@ def handleInput(input: str):
             # TODO: add objective defining function when implemented
             pass
         case "move":
+            player.actions_left -= 1
             # TODO: add move function when implemented, make sure to include the cardinal directions
             pass
         case "mine" | "m":
+            player.actions_left -= 1
             # TODO: add mine function when implemented
             pass
         case "inspect" | "i":
@@ -74,15 +73,18 @@ def handleInput(input: str):
             # TODO: add grab function when implemented
             pass
         case "dynamite" | "d":
+            player.actions_left -= 2
             # TODO: add dynamite (remove caved in tile) function when implemented
             pass
         case "weapon" | "fight" | "f" | "battle" | "b" | "kill":
+            player.actions_left -= 2
             # TODO: add fight function when implemented
             pass
         case "quit" | "q":
             if not set(arguments).isdisjoint(["quit", "yes", "y", "q", "game"]):
                 print("Thank you for playing Zwerg. Goodbye!")
                 running = False
+                player.actions_left = 0
             else:
                 print("Are you sure you would like to quit? Progress will not be saved...\n(Please type in Quit Game to confirm).")
         case _:
@@ -91,19 +93,18 @@ def handleInput(input: str):
 
 # beginning of game code
 daysPassed = 0
-player: Player.Player
+player: Player.Player = Player.Player()
 map = generateMap()
 running = True
 
 
 # game loop
 while running:
+    player.actions_left += Constants.NumPlayerMoves #refunds 3 actions
     # run player moves
-    for turn in range(Constants.NumPlayerMoves):
+    while player.actions_left > 0:
         command = input(">>> ")
         handleInput(command)
-        if not running:
-            break
 
     occurrence_probability(daysPassed)
     daysPassed += 1
