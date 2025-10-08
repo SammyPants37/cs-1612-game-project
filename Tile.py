@@ -4,7 +4,7 @@ import Constants
 
 class Tile():
     def __init__(self, pos, resourceType: Minerals.mineralTypes, isExit: bool) -> None:
-        self.pos = pos
+        self.pos: tuple[int, int] = pos
         self.resourceType: Minerals.mineralTypes = resourceType
         self.cavedIn: bool = False
         self.isDiscovered: bool = False
