@@ -26,6 +26,7 @@ def generateMap() -> list[list[Tile.Tile]]:
     map[Constants.mapHeight-1][random.randint(0, Constants.mapWidth-1)].isExit = True
     playerX = random.randint(0, Constants.mapWidth-1)
     player.setPos((playerX, 0))
+    map[0][playerX].isDiscovered = True
     return map
 
 
@@ -58,10 +59,42 @@ def helpMenu():
     print("Quit (game, quit)")
 
 
+def move(args: list[str], map: list[list[Tile.Tile]]):
+    global player
+    arg = args[0]
+    if len(args) > 1:
+        print("all arguments past the first one have been discarded")
+    if arg in ["n", "s", "e", "w", "north", "south", "east", "west"]:
+        newPos: tuple[int, int] = (0, 0)
+        match arg:
+            case "n" | "north":
+                newPos = (player.pos[0] + 0, player.pos[1] - 1)                    
+            case "s" | "south":
+                newPos = (player.pos[0] + 0, player.pos[1] + 1)
+            case "e" | "east":
+                newPos = (player.pos[0] + 1, player.pos[1] + 0)
+            case "w" | "west":
+                newPos = (player.pos[0] - 1, player.pos[1] + 0)
+            case _:
+                newPos = player.pos
+
+        YCordValid: bool = newPos[1] >= 0 and newPos[1] < Constants.mapHeight
+        XCordValid: bool = newPos[0] >= 0 and newPos[0] < Constants.mapWidth
+        if not map[newPos[1]][newPos[0]].cavedIn and YCordValid and XCordValid:
+            player.pos = newPos
+            map[newPos[1]][newPos[0]].isDiscovered = True
+            print(f"moved {arg}")
+        else:
+            print("cannot move that direction")
+    else:
+        print(f"move: unknown argument \"{arg}\". Valid arguments include n, s, e, w, north, south, east, or west")
+
+
 def handleInput(input: str):
     global running
     command = input.split(" ")[0].lower().strip()
     arguments = input.split(" ")[1:] # args will be passed to each command when they're implemented
+    arguments = [arg.lower().strip() for arg in arguments]
     match command:
         case "rules" | "r":
             # TODO: add rules function when implemented
@@ -71,7 +104,7 @@ def handleInput(input: str):
             pass
         case "move":
             player.actions_left -= 1
-            # TODO: add move function when implemented, make sure to include the cardinal directions
+            move(arguments, map)
             pass
         case "mine" | "m":
             player.actions_left -= 1
@@ -114,7 +147,7 @@ map = generateMap()
 running = True
 
 
-print(helpMenu())
+helpMenu()
 
 # game loop
 while running:
