@@ -42,7 +42,20 @@ def showMap(map: list[list[Tile.Tile]]) -> None:
             line += Constants.mapExtras[workingRow]
         print(line)
         workingRow += 1
-            
+
+
+def helpMenu():
+    print("Welcome to the game! Here are some inputs you can use")
+    print("Rules")
+    print("Objective")
+    print("Move (n, s, e, w)")
+    print("Mine")
+    print("Inspect")
+    print("grab")
+    print("dynamite")
+    print("weapon")
+    print("help")
+    print("Quit (game, quit)")
 
 
 def handleInput(input: str):
@@ -80,6 +93,9 @@ def handleInput(input: str):
             player.actions_left -= 2
             # TODO: add fight function when implemented
             pass
+        case "help":
+            # show the help menu when the help command is run
+            helpMenu()
         case "quit" | "q":
             if not set(arguments).isdisjoint(["quit", "yes", "y", "q", "game"]):
                 print("Thank you for playing Zwerg. Goodbye!")
@@ -97,6 +113,8 @@ player: Player.Player = Player.Player()
 map = generateMap()
 running = True
 
+
+print(helpMenu())
 
 # game loop
 while running:
