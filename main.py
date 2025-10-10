@@ -97,6 +97,16 @@ player: Player.Player = Player.Player()
 map = generateMap()
 running = True
 
+def menu():
+    print("Welcome to the game! Here are some inputs you can use")
+    print("1. Rules")
+    print("2. Objective")
+    print("3. Move (n, s, e, w)")
+    print("4. Mine")
+    print("5. Inspect")
+    print("6. Inspect")
+    print("7. Quit")
+print(menu())
 
 # game loop
 while running:
