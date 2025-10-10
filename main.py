@@ -106,6 +106,7 @@ def menu():
     print("5. Inspect")
     print("6. Inspect")
     print("7. Quit")
+    choice = int(input("Input: "))
 print(menu())
 
 # game loop
