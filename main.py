@@ -21,7 +21,7 @@ def generateMap() -> list[list[Tile.Tile]]:
     for h in range(Constants.mapHeight):
         map.append([])
         for w in range(Constants.mapWidth):
-            map[h].append(Tile.Tile((w, h), random.choices(list(Minerals.mineralTypes), weights=Minerals.weights)[0], False))
+            map[h].append(Tile.Tile((w, h), Tile.mineralRandomizer(1),False, Tile.mineralRandomizer(2)))
             map[h][w].setItem(random.choices(list(Constants.Items), weights=[290, 5, 5])[0])
     map[Constants.mapHeight-1][random.randint(0, Constants.mapWidth-1)].isExit = True
     playerX = random.randint(0, Constants.mapWidth-1)
@@ -65,8 +65,7 @@ def handleInput(input: str):
             # TODO: add mine function when implemented
             pass
         case "inspect" | "i":
-            # TODO: add inspect function when implemented
-            pass
+            Player.Player.inspectTile()
         case "compass" | "map" | "check" | "c":
             showMap(map)
         case "grab" | "pick" | "g" | "p":
