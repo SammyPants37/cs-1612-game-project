@@ -65,7 +65,7 @@ def handleInput(input: str):
             # TODO: add mine function when implemented
             pass
         case "inspect" | "i":
-            Player.Player.inspectTile()
+            Player.Player.inspect_tile()
         case "compass" | "map" | "check" | "c":
             showMap(map)
         case "grab" | "pick" | "g" | "p":
