@@ -4,6 +4,22 @@ import Constants, Tile, Player
 
 # rest of code goes here
 
+def inspect_tile():
+    true_mineral = map[player.pos[1]][player.pos[0]].resourceType  #gives the real mineral
+    fake_mineral = map[player.pos[1]][player.pos[0]].fakeTypes # gives 2 fake minerals for the tile the player is on
+    true_mineral_pos = random.randint(1, 3)
+    # randomly generates a position for the real mineral every inspect, keeps order
+    if true_mineral_pos == 1:
+        said_mineral = [true_mineral, fake_mineral[0], fake_mineral[1]]
+    elif true_mineral_pos == 2:
+        said_mineral = [fake_mineral[1], true_mineral, fake_mineral[0]]
+    else:  # when true_mineral_pos is the 3rd position
+        said_mineral = [fake_mineral[0], fake_mineral[1], true_mineral]
+    print(f"Hmm... I think I could find {said_mineral[0].description}, {said_mineral[1].description}, or {said_mineral[2].description} in this segment of the mine")
+    # TODO:
+    #  if the tile the player is on has an item:
+    #    print(f"While gleaming the mine for potential minerals, I found {item on tile} that I could grab if space allows")
+
 def occurrence_probability(numDays: int):
     possibleEvents = Constants.event_number_scaler(numDays) #sets number of events equal to the number off our formula
     numEvents = 0
@@ -21,7 +37,7 @@ def generateMap() -> list[list[Tile.Tile]]:
     for h in range(Constants.mapHeight):
         map.append([])
         for w in range(Constants.mapWidth):
-            map[h].append(Tile.Tile((w, h), random.choices(list(Minerals.mineralTypes), weights=Minerals.weights)[0], False))
+            map[h].append(Tile.Tile((w, h), Tile.mineralRandomizer(1)[0],False, Tile.mineralRandomizer(2)))
             map[h][w].setItem(random.choices(list(Constants.Items), weights=[290, 5, 5])[0])
     map[Constants.mapHeight-1][random.randint(0, Constants.mapWidth-1)].isExit = True
     playerX = random.randint(0, Constants.mapWidth-1)
@@ -78,8 +94,7 @@ def handleInput(input: str):
             # TODO: add mine function when implemented
             pass
         case "inspect" | "i":
-            # TODO: add inspect function when implemented
-            pass
+            inspect_tile()
         case "compass" | "map" | "check" | "c":
             showMap(map)
         case "grab" | "pick" | "g" | "p":

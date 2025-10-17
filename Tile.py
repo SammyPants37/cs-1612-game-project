@@ -1,11 +1,19 @@
 from typing import override
 from Constants import Minerals
-import Constants
+import Constants, random
+
+
+def mineralRandomizer(wanted_list_size):  # created a separate function so not to make the other line too long
+    mineral = random.choices(list(Minerals.mineralTypes), weights=Minerals.weights, k=2)[0:wanted_list_size]
+    return mineral #added k=2 above since needed 2 minerals for the fake ones
+
 
 class Tile():
-    def __init__(self, pos, resourceType: Minerals.mineralTypes, isExit: bool) -> None:
+
+    def __init__(self, pos, resourceType: Minerals.mineralTypes, isExit: bool, fakeTypes: list[Minerals.mineralTypes]) -> None:
         self.pos: tuple[int, int] = pos
         self.resourceType: Minerals.mineralTypes = resourceType
+        self.fakeTypes: list = fakeTypes
         self.cavedIn: bool = False
         self.isDiscovered: bool = False
         self.isExit: bool = isExit
@@ -43,4 +51,3 @@ class Tile():
                         return "O"
             else:
                 return "?"
-

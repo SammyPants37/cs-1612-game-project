@@ -27,4 +27,3 @@ class Player:
 
     def setPos(self, pos: tuple[int, int]):
         self.pos = pos
-
