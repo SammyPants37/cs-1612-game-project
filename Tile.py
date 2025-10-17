@@ -10,7 +10,7 @@ def mineralRandomizer(wanted_list_size):  # created a separate function so not t
 
 class Tile():
 
-    def __init__(self, pos, resourceType: Minerals.mineralTypes, isExit: bool, fakeTypes: list) -> None:
+    def __init__(self, pos, resourceType: Minerals.mineralTypes, isExit: bool, fakeTypes: list[Minerals.mineralTypes]) -> None:
         self.pos: tuple[int, int] = pos
         self.resourceType: Minerals.mineralTypes = resourceType
         self.fakeTypes: list = fakeTypes
