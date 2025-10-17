@@ -7,7 +7,7 @@ import Constants, Tile, Player
 def inspect_tile():
     true_mineral = map[player.pos[1]][player.pos[0]].resourceType  #gives the real mineral
     fake_mineral = map[player.pos[1]][player.pos[0]].fakeTypes # gives 2 fake minerals for the tile the player is on
-    true_mineral_pos = random.randint(1, 1)
+    true_mineral_pos = random.randint(1, 3)
     # randomly generates a position for the real mineral every inspect, keeps order
     if true_mineral_pos == 1:
         said_mineral = [true_mineral, fake_mineral[0], fake_mineral[1]]
