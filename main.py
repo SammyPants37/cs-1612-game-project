@@ -15,7 +15,7 @@ def inspect_tile():
         said_mineral = [fake_mineral[1], true_mineral, fake_mineral[0]]
     else:  # when true_mineral_pos is the 3rd position
         said_mineral = [fake_mineral[0], fake_mineral[1], true_mineral]
-    print(f"Hmm... I think I could find {said_mineral[0]}, {said_mineral[1]}, or {said_mineral[2]} in this segment of the mine")
+    print(f"Hmm... I think I could find {said_mineral[0].description}, {said_mineral[1].description}, or {said_mineral[2].description} in this segment of the mine")
     # TODO:
     #  if the tile the player is on has an item:
     #    print(f"While gleaming the mine for potential minerals, I found {item on tile} that I could grab if space allows")
