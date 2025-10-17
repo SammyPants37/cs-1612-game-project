@@ -1,18 +1,11 @@
 from typing import override
 from Constants import Minerals
-import Constants, random, Player, main
+import Constants, random
 
 
 def mineralRandomizer(wanted_list_size):  # created a separate function so not to make the other line too long
     mineral = random.choices(list(Minerals.mineralTypes), weights=Minerals.weights, k=2)[0:wanted_list_size]
     return mineral #added k=2 above since needed 2 minerals for the fake ones
-
-def mineral_forPos(): #iterates over each tile of the map
-    for row in main.map:
-        coord = tuple(row[0]) #looks at tile position
-        if coord == Player.Player.returnPos(): #compares to player pos
-            return row[1:4:2] #returns real and fake, skipping isExit
-    return None
 
 
 class Tile():

@@ -4,6 +4,22 @@ import Constants, Tile, Player
 
 # rest of code goes here
 
+def inspect_tile():
+    true_mineral = map[player.pos[1]][player.pos[0]].resourceType #gives the real mineral
+    fake_mineral = map[player.pos[1]][player.pos[0]].fakeTypes # gives 2 fake minerals for the tile the player is on
+    true_mineral_pos = random.randint(1, 3)
+    # randomly generates a position for the real mineral every inspect, keeps order
+    if true_mineral_pos == 1:
+        said_mineral = [true_mineral, fake_mineral[0], fake_mineral[1]]
+    elif true_mineral_pos == 2:
+        said_mineral = [fake_mineral[1], true_mineral, fake_mineral[0]]
+    else:  # when true_mineral_pos is the 3rd position
+        said_mineral = [fake_mineral[0], fake_mineral[1], true_mineral]
+    print(f"Hmm... I think I could find {said_mineral[0]}, {said_mineral[1]}, or {said_mineral[2]} in this segment of the mine")
+    # TODO:
+    #  if the tile the player is on has an item:
+    #    print(f"While gleaming the mine for potential minerals, I found {item on tile} that I could grab if space allows")
+
 def occurrence_probability(numDays: int):
     possibleEvents = Constants.event_number_scaler(numDays) #sets number of events equal to the number off our formula
     numEvents = 0
@@ -65,7 +81,7 @@ def handleInput(input: str):
             # TODO: add mine function when implemented
             pass
         case "inspect" | "i":
-            Player.Player.inspect_tile()
+            inspect_tile()
         case "compass" | "map" | "check" | "c":
             showMap(map)
         case "grab" | "pick" | "g" | "p":
