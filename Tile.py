@@ -3,7 +3,7 @@ from Constants import Minerals
 import Constants, random
 
 
-def mineralRandomizer(wanted_list_size):  # created a separate function so not to make the other line too long
+def mineralRandomizer(wanted_list_size: int) -> list[Minerals.mineralTypes]:  # created a separate function so not to make the other line too long
     mineral = random.choices(list(Minerals.mineralTypes), weights=Minerals.weights, k=2)[0:wanted_list_size]
     return mineral #added k=2 above since needed 2 minerals for the fake ones
 
@@ -13,7 +13,7 @@ class Tile():
     def __init__(self, pos, resourceType: Minerals.mineralTypes, isExit: bool, fakeTypes: list[Minerals.mineralTypes]) -> None:
         self.pos: tuple[int, int] = pos
         self.resourceType: Minerals.mineralTypes = resourceType
-        self.fakeTypes: list = fakeTypes
+        self.fakeTypes: list[Minerals.mineralTypes] = fakeTypes
         self.cavedIn: bool = False
         self.isDiscovered: bool = False
         self.isExit: bool = isExit
