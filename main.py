@@ -4,9 +4,17 @@ import Constants, Tile, Player
 
 # rest of code goes here
 
-def inspect_tile():
-    true_mineral = map[player.pos[1]][player.pos[0]].resourceType  #gives the real mineral
-    fake_mineral = map[player.pos[1]][player.pos[0]].fakeTypes # gives 2 fake minerals for the tile the player is on
+
+def mineTile(tilePos: tuple[int, int]):
+    tileMineral: Minerals.mineralTypes = map[tilePos[1]][tilePos[0]].resourceType
+    player.add_score(tileMineral)
+    map[tilePos[1]][tilePos[0]].drainMineral()
+    print(tileMineral.miningDescription)
+
+
+def inspect_tile(tilePos: tuple[int, int]):
+    true_mineral = map[tilePos[1]][tilePos[0]].resourceType  #gives the real mineral
+    fake_mineral = map[tilePos[1]][tilePos[0]].fakeTypes # gives 2 fake minerals for the tile the player is on
     true_mineral_pos = random.randint(1, 3)
     # randomly generates a position for the real mineral every inspect, keeps order
     if true_mineral_pos == 1:
@@ -124,10 +132,9 @@ def handleInput(input: str):
             pass
         case "mine" | "m":
             player.actions_left -= 1
-            # TODO: add mine function when implemented
-            pass
+            mineTile(player.pos)
         case "inspect" | "i":
-            inspect_tile()
+            inspect_tile(player.pos)
         case "compass" | "map" | "check" | "c":
             showMap(map)
         case "grab" | "pick" | "g" | "p":
