@@ -77,33 +77,45 @@ def helpMenu():
 
 def move(args: list[str], map: list[list[Tile.Tile]]):
     global player
-    arg = args[0]
-    if len(args) > 1:
-        print("all arguments past the first one have been discarded")
-    if arg in ["n", "s", "e", "w", "north", "south", "east", "west"]:
-        newPos: tuple[int, int] = (0, 0)
-        match arg:
-            case "n" | "north":
-                newPos = (player.pos[0] + 0, player.pos[1] - 1)                    
-            case "s" | "south":
-                newPos = (player.pos[0] + 0, player.pos[1] + 1)
-            case "e" | "east":
-                newPos = (player.pos[0] + 1, player.pos[1] + 0)
-            case "w" | "west":
-                newPos = (player.pos[0] - 1, player.pos[1] + 0)
-            case _:
-                newPos = player.pos
+    try:
+        arg = args[0]
+        if len(args) > 1:
+            print("all arguments past the first one have been discarded")
+        if arg in ["n", "s", "e", "w", "north", "south", "east", "west"]:
+            newPos: tuple[int, int] = (0, 0)
+            match arg:
+                case "n" | "north":
+                    newPos = (player.pos[0] + 0, player.pos[1] - 1)
+                case "s" | "south":
+                    newPos = (player.pos[0] + 0, player.pos[1] + 1)
+                case "e" | "east":
+                    newPos = (player.pos[0] + 1, player.pos[1] + 0)
+                case "w" | "west":
+                    newPos = (player.pos[0] - 1, player.pos[1] + 0)
+                case _:
+                    newPos = player.pos
 
-        YCordValid: bool = newPos[1] >= 0 and newPos[1] < Constants.mapHeight
-        XCordValid: bool = newPos[0] >= 0 and newPos[0] < Constants.mapWidth
-        if not map[newPos[1]][newPos[0]].cavedIn and YCordValid and XCordValid:
-            player.pos = newPos
-            map[newPos[1]][newPos[0]].isDiscovered = True
-            print(f"moved {arg}")
+            YCordValid: bool = newPos[1] >= 0 and newPos[1] < Constants.mapHeight
+            XCordValid: bool = newPos[0] >= 0 and newPos[0] < Constants.mapWidth
+            if YCordValid and XCordValid and map[newPos[1]][newPos[0]].cavedIn:
+                print("It seems the cave has caved in that way... dynamite would be useful here")
+                YCordValid = False
+                map[newPos[1]][newPos[0]].isDiscovered = True
+            if YCordValid and XCordValid and map[newPos[1]][newPos[0]].hasMaulwurf:
+                print("Terrible growling rings through the cavern that way, alongside a waft of blood... only a weapon would allow continuation")
+                YCordValid = False
+                map[newPos[1]][newPos[0]].isDiscovered = True
+            if YCordValid and XCordValid:
+                player.pos = newPos
+                map[newPos[1]][newPos[0]].isDiscovered = True
+                player.actions_left -= 1
+                print(f"moved {arg}")
+            else:
+                print("cannot move that direction")
         else:
-            print("cannot move that direction")
-    else:
-        print(f"move: unknown argument \"{arg}\". Valid arguments include n, s, e, w, north, south, east, or west")
+            print(f"move: unknown argument \"{arg}\". Valid arguments include n, s, e, w, north, south, east, or west")
+    except IndexError:
+        print("Please specify a direction to move (n, s, e, w)")
 
 
 def handleInput(input: str):
@@ -119,9 +131,10 @@ def handleInput(input: str):
             # TODO: add objective defining function when implemented
             pass
         case "move":
-            player.actions_left -= 1
             move(arguments, map)
             pass
+        case "n" | "s" | "e" | "w" | "north" | "south" | "east" | "west":
+            move(list(command), map)
         case "mine" | "m":
             player.actions_left -= 1
             # TODO: add mine function when implemented
