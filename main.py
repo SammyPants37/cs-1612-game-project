@@ -85,14 +85,16 @@ def helpMenu():
 
 def move(args: list[str], map: list[list[Tile.Tile]]):
     global player
-    arg = args[0]
+    try: arg = args[0]
+    except IndexError: #when there is no list
+        return "Please specify a direction to move (n, s, e, w)"
     if len(args) > 1:
         print("all arguments past the first one have been discarded")
     if arg in ["n", "s", "e", "w", "north", "south", "east", "west"]:
         newPos: tuple[int, int] = (0, 0)
         match arg:
             case "n" | "north":
-                newPos = (player.pos[0] + 0, player.pos[1] - 1)                    
+                newPos = (player.pos[0] + 0, player.pos[1] - 1)
             case "s" | "south":
                 newPos = (player.pos[0] + 0, player.pos[1] + 1)
             case "e" | "east":
@@ -104,14 +106,24 @@ def move(args: list[str], map: list[list[Tile.Tile]]):
 
         YCordValid: bool = newPos[1] >= 0 and newPos[1] < Constants.mapHeight
         XCordValid: bool = newPos[0] >= 0 and newPos[0] < Constants.mapWidth
-        if not map[newPos[1]][newPos[0]].cavedIn and YCordValid and XCordValid:
-            player.pos = newPos
-            map[newPos[1]][newPos[0]].isDiscovered = True
-            print(f"moved {arg}")
+        if YCordValid and XCordValid:
+            map[newPos[1]][newPos[0]].isDiscovered = True #makes it so the tile is discovered if the coords are valid
+            # happens regardless if the tile is cavedIn or hasMaulwurf, makes so they will show up on map
+            if map[newPos[1]][newPos[0]].cavedIn:
+                #tells the player if the tile has caved in, makes it show on map, hints at dynamite
+                return "It seems the cave has caved in that way... dynamite would be useful here"
+            elif map[newPos[1]][newPos[0]].hasMaulwurf:
+                #tells the player if the tile has Maulwurf, makes it show on map, hints at weapon
+                return "Terrible growling rings through the cavern that way, alongside a waft of blood... only a weapon would allow continuation"
+            else:
+                player.pos = newPos #sets the player's position to the new one
+                player.actions_left -= 1 #takes away an action after the player has successfully moved
+                return f"moved {arg}"
         else:
-            print("cannot move that direction")
+            return "cannot move that direction"
     else:
-        print(f"move: unknown argument \"{arg}\". Valid arguments include n, s, e, w, north, south, east, or west")
+        return f"move: unknown argument \"{arg}\". Valid arguments include n, s, e, w, north, south, east, or west"
+
 
 
 def handleInput(input: str):
@@ -127,9 +139,10 @@ def handleInput(input: str):
             # TODO: add objective defining function when implemented
             pass
         case "move":
-            player.actions_left -= 1
-            move(arguments, map)
+            print(move(arguments, map))
             pass
+        case "n" | "s" | "e" | "w" | "north" | "south" | "east" | "west":
+            print(move(list(command), map))
         case "mine" | "m":
             player.actions_left -= 1
             mineTile(player.pos)
