@@ -98,17 +98,19 @@ def move(args: list[str], map: list[list[Tile.Tile]]):
             YCordValid: bool = newPos[1] >= 0 and newPos[1] < Constants.mapHeight
             XCordValid: bool = newPos[0] >= 0 and newPos[0] < Constants.mapWidth
             if YCordValid and XCordValid and map[newPos[1]][newPos[0]].cavedIn:
+                #tells the player if the tile has caved in, makes it show on map, hints at dynamite
                 print("It seems the cave has caved in that way... dynamite would be useful here")
                 YCordValid = False
                 map[newPos[1]][newPos[0]].isDiscovered = True
             if YCordValid and XCordValid and map[newPos[1]][newPos[0]].hasMaulwurf:
+                #tells the plaayer if the tile has Maulwurf, makes it show on map, hints at weapon
                 print("Terrible growling rings through the cavern that way, alongside a waft of blood... only a weapon would allow continuation")
                 YCordValid = False
                 map[newPos[1]][newPos[0]].isDiscovered = True
             if YCordValid and XCordValid:
                 player.pos = newPos
                 map[newPos[1]][newPos[0]].isDiscovered = True
-                player.actions_left -= 1
+                player.actions_left -= 1 #takes away an action after the player has successfully moved
                 print(f"moved {arg}")
             else:
                 print("cannot move that direction")
