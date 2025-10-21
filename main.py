@@ -75,16 +75,10 @@ def showMap(map: list[list[Tile.Tile]]) -> None:
 
 def helpMenu():
     print("Welcome to the game! Here are some inputs you can use")
-    print("Rules")
-    print("Objective")
-    print("Move (n, s, e, w)")
-    print("Mine")
-    print("Inspect")
-    print("grab")
-    print("dynamite")
-    print("weapon")
-    print("help")
-    print("Quit (game, quit)")
+    print("Rules                Move (n, s, e, w)           Grab\n"
+          "Objective            Mine                        Dynamite\n"
+          "Map                  Inspect                     Weapon\n"
+          "Help                 Quit (game, quit)")
 
 
 def move(args: list[str], map: list[list[Tile.Tile]]):
