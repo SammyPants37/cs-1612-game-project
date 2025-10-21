@@ -4,6 +4,10 @@ import Constants, Tile, Player
 
 # rest of code goes here
 
+def drop_item(tilePos: tuple[int, int]):
+    # grab_item takes the player's tile's item, spits out whatever will have to be dropped
+    dropped_item: Constants.Items = player.grab_item(map[tilePos[1]][tilePos[0]].item)
+    map[tilePos[1]][tilePos[0]].setItem(dropped_item) # sets the tile to the dropped item (sometimes nothing)
 
 def mineTile(tilePos: tuple[int, int]):
     tileMineral: Minerals.mineralTypes = map[tilePos[1]][tilePos[0]].resourceType
@@ -24,9 +28,9 @@ def inspect_tile(tilePos: tuple[int, int]):
     else:  # when true_mineral_pos is the 3rd position
         said_mineral = [fake_mineral[0], fake_mineral[1], true_mineral]
     print(f"Hmm... I think I could find {said_mineral[0].description}, {said_mineral[1].description}, or {said_mineral[2].description} in this segment of the mine")
-    # TODO:
-    #  if the tile the player is on has an item:
-    #    print(f"While gleaming the mine for potential minerals, I found {item on tile} that I could grab if space allows")
+
+    if map[tilePos[1]][tilePos[0]].item != map[tilePos[1]][tilePos[0]].item.nothing: #if there is an item on the player's tile
+        print(f"While gleaming the mine for potential minerals, I found a {map[tilePos[1]][tilePos[0]].item.name} that I could grab if space allows")
 
 def occurrence_probability(numDays: int):
     possibleEvents = Constants.event_number_scaler(numDays) #sets number of events equal to the number off our formula
@@ -46,7 +50,7 @@ def generateMap() -> list[list[Tile.Tile]]:
         map.append([])
         for w in range(Constants.mapWidth):
             map[h].append(Tile.Tile((w, h), Tile.mineralRandomizer(1)[0],False, Tile.mineralRandomizer(2)))
-            map[h][w].setItem(random.choices(list(Constants.Items), weights=[290, 5, 5])[0])
+            map[h][w].setItem(random.choices(list(Constants.Items), weights = Constants.item_weights())[0])
     map[Constants.mapHeight-1][random.randint(0, Constants.mapWidth-1)].isExit = True
     playerX = random.randint(0, Constants.mapWidth-1)
     player.setPos((playerX, 0))
@@ -151,8 +155,7 @@ def handleInput(input: str):
         case "compass" | "map" | "check" | "c":
             showMap(map)
         case "grab" | "pick" | "g" | "p":
-            # TODO: add grab function when implemented
-            pass
+            drop_item(player.pos)
         case "dynamite" | "d":
             player.actions_left -= 2
             # TODO: add dynamite (remove caved in tile) function when implemented
