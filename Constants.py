@@ -45,6 +45,8 @@ class Items(Enum):
     dynamite = 1
     weapon = 2
 
+def item_weights(): # to make items more or less common
+    return [40,5,5] # nothing, dynamite, weapon
 
 mapExtras = [
     "	Legend:",
