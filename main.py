@@ -41,9 +41,17 @@ def occurrence_probability(numDays: int):
             if rand_event == 1:
                 rand_den_infest()
             else:
-                print("Cave In Occurred")
-                # TODO: Cave In Func
+                rand_cave_in()
         possibleEvents -= 1
+
+def rand_cave_in():
+    unblocked_tiles = []
+    for h in range(mapHeight):
+        for w in range(mapWidth):
+            if not map[h][w].cavedIn:
+                unblocked_tiles.append([w, h])
+    chosen_tile = random.choice(unblocked_tiles) # chooses an unblocked tile for a cave in to occur
+    map[chosen_tile[1]][chosen_tile[0]].cavedIn = True
 
 def rand_den_infest():
     maulwurf_dens = []
@@ -51,12 +59,11 @@ def rand_den_infest():
         for w in range(mapWidth):
             if map[h][w].resourceType == Minerals.mineralTypes.monsterDen and not map[h][w].cavedIn:
                 maulwurf_dens.append([w, h])
-    if len(maulwurf_dens) > 0:
-        chosen_den = random.choice(maulwurf_dens)
+    if len(maulwurf_dens) > 0: # when there are unblocked dens
+        chosen_den = random.choice(maulwurf_dens) #choose one out of them to infest from
         infest_tile(chosen_den)
     else:
-        print("No available dens, it's cave in time")
-        # TODO: put Cave In Func here too
+        rand_cave_in() #when all the dens are blocked a cave in happens randomly
 
 def infest_tile(tilePos: tuple[int, int]):
     if not map[tilePos[1]][tilePos[0]].hasMaulwurf: # if the den doesn't have Maulwurf on it
@@ -73,7 +80,7 @@ def infest_tile(tilePos: tuple[int, int]):
             if tilePos[1] - 1 >= 0 and not map[tilePos[1]][tilePos[0] - 1].cavedIn:
                 available_directions.append("west")
             if num_tries == mapWidth or len(available_directions) == 0: # if cap is reached, or there's no valid direction
-                map[tilePos[1]][tilePos[0] - 1].setCavedIn(True) # the tile caves in from too much Maulwurf traffic
+                map[tilePos[1]][tilePos[0]].setCavedIn(True) # the tile caves in from too much Maulwurf traffic
                 break # or overcrowding, either way it caves in
             infest_direction = random.choice(available_directions) # randomly selects direction out of valid ones
             if infest_direction == "north":
