@@ -51,14 +51,14 @@ def item_weights(): # to make items more or less common
 mapExtras = [
     "	Legend:",
     "	?: unexplored tile		    N",
-    "	_: unmineable tile		    ᐃ",
-    "	#: caved in tile		W ᐊ ⚪ ᐅ E",
-    "	P: player			    ᐁ",
-    "	O: mineral tile			    S",
-    "	E: exit/escape tile		",
-    "	M: monster infested tile",
-    "	D: monster den tile		"]
-        
+    "	\033[37m_\033[0m: unmineable tile		    ᐃ",
+    "	\033[31m#\033[0m: caved in tile		W ᐊ ⚪ ᐅ E",
+    "	\033[36mP\033[0m: player			    ᐁ",
+    "	\033[32mO\033[0m: mineral tile			    S",
+    "	\033[34mE\033[0m: exit/escape tile		",
+    "	\033[33mM\033[0m: monster infested tile",
+    "	\033[35mD\033[0m: monster den tile		"]
+# refer to Tile.py, in @override to see comments for each symbol's color, main.py showMap for P
 
 mapWidth = 25
 mapHeight = 25

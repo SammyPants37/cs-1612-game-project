@@ -35,19 +35,19 @@ class Tile():
     @override
     def __str__(self) -> str:
         if self.isExit:
-            return "E"
+            return "\033[34mE\033[0m" # returns E in blue
         else:
             if self.isDiscovered:
                 if self.cavedIn:
-                    return "#"
+                    return "\033[31m#\033[0m" # returns # in red
                 elif self.hasMaulwurf:
-                    return "M"
+                    return "\033[33mM\033[0m" # returns M in yellow
                 match self.resourceType:
                     case Minerals.mineralTypes.unminable:
-                        return "_"
+                        return "\033[37m_\033[0m" # returns _ in gray
                     case Minerals.mineralTypes.monsterDen:
-                        return "D"
+                        return "\033[35mD\033[0m" # returns D in purple
                     case _:
-                        return "O"
+                        return "\033[32mO\033[0m" # returns O in green
             else:
                 return "?"
