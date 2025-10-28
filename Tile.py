@@ -23,22 +23,14 @@ class Tile():
     def setItem(self, item: Constants.Items):
         self.item = item
     
-    def setCavedIn(self, isCavedIn: bool, player_pos: tuple[int, int]):
+    def setCavedIn(self, isCavedIn: bool):
         self.cavedIn = isCavedIn
-        if player_pos == self.pos:
-            print("Ow! The cavern you are in collapsed!")
-            return True, player_pos # returns to function that randomly chooses a tile for the player to get kicked to
-        return False
 
     def drainMineral(self):
         self.resourceType = Minerals.mineralTypes.unminable
 
-    def setMaulwurfStatus(self, hasMaulwurf: bool, player_pos: tuple[int, int]):
+    def setMaulwurfStatus(self, hasMaulwurf: bool):
         self.hasMaulwurf = hasMaulwurf
-        if player_pos == self.pos:
-            print("Oh no! An overwhelming horde of Maulwurf flooded into the cave!")
-            return True, player_pos # returns to function that randomly chooses a tile for the player to get kicked to
-        return False
 
     @override
     def __str__(self) -> str:
