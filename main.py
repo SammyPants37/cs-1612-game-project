@@ -32,6 +32,26 @@ def inspect_tile(tilePos: tuple[int, int]):
     if map[tilePos[1]][tilePos[0]].item != map[tilePos[1]][tilePos[0]].item.nothing: #if there is an item on the player's tile
         print(f"While gleaming the mine for potential minerals, I found a {map[tilePos[1]][tilePos[0]].item.name} that I could grab if space allows")
 
+def kick_player(answer: bool, pos: tuple[int, int]): # didn't want player.pos in Tile.py
+    if answer: # When answer is True, i.e., player got squashed or overrun
+        available_directions = []  # below checks to see if a given direction is valid, appending it if it is
+        if pos[1] - 1 >= 0 and not (map[pos[1] - 1][pos[0]].cavedIn or map[pos[1] - 1][pos[0]].hasMaulwurf):
+            available_directions.append("north")
+        if pos[1] + 1 < mapHeight and not (map[pos[1] + 1][pos[0]].cavedIn or map[pos[1] + 1][pos[0]].hasMaulwurf):
+            available_directions.append("south")
+        if pos[0] + 1 < mapWidth and not (map[pos[1]][pos[0] + 1].cavedIn or map[pos[1]][pos[0] + 1].hasMaulwurf):
+            available_directions.append("east")
+        if pos[1] - 1 >= 0 and not (map[pos[1]][pos[0] - 1].cavedIn or map[pos[1]][pos[0] - 1].hasMaulwurf):
+            available_directions.append("west")
+        if len(available_directions) == 0: # if there are no valid directions
+            global running
+            running = False
+            player.actions_left = 0
+            return "YOU DIED -- Score: 0 \nThank you for playing Maulwurf"
+        move(list(random.choice(available_directions)), map) # else a random direction is picked to move
+    return ""
+
+
 def occurrence_probability(numDays: int):
     possibleEvents = Constants.event_number_scaler(numDays) #sets number of events equal to the number off our formula
     while possibleEvents > 0: #while potential events haven't occurred
@@ -51,7 +71,7 @@ def rand_cave_in():
             if not map[h][w].cavedIn:
                 unblocked_tiles.append([w, h])
     chosen_tile = random.choice(unblocked_tiles) # chooses an unblocked tile for a cave in to occur
-    map[chosen_tile[1]][chosen_tile[0]].setCavedIn(True, player.pos)
+    kick_player(map[chosen_tile[1]][chosen_tile[0]].setCavedIn(True, player.pos))
 
 def rand_den_infest():
     maulwurf_dens = []
@@ -63,11 +83,11 @@ def rand_den_infest():
         chosen_den = random.choice(maulwurf_dens) #choose one out of them to infest from
         infest_tile(chosen_den)
     else:
-        rand_cave_in() #when all the dens are blocked a cave in happens randomly
+        rand_cave_in() #when all the dens are blocked a cave in happens randomly instead
 
 def infest_tile(tilePos: tuple[int, int]):
     if not map[tilePos[1]][tilePos[0]].hasMaulwurf: # if the den doesn't have Maulwurf on it
-        map[tilePos[1]][tilePos[0]].setMaulwurfStatus(True, player.pos) # it does now
+        kick_player(map[tilePos[1]][tilePos[0]].setMaulwurfStatus(True, player.pos)) # it does now
     else: # else when it has Maulwurf (initially had a while loop, but there was a potential for an infinite loop)
         for num_tries in range(mapWidth): # I chose mapWidth (which scales good enough) as the cap for looking for values
             available_directions = [] # below checks to see if a given direction is valid, appending it if it is
@@ -80,32 +100,32 @@ def infest_tile(tilePos: tuple[int, int]):
             if tilePos[1] - 1 >= 0 and not map[tilePos[1]][tilePos[0] - 1].cavedIn:
                 available_directions.append("west")
             if num_tries == mapWidth or len(available_directions) == 0: # if cap is reached, or there's no valid direction
-                map[tilePos[1]][tilePos[0]].setCavedIn(True, player.pos) # tile caves in
+                kick_player(map[tilePos[1]][tilePos[0]].setCavedIn(True, player.pos)) # tile caves in
                 break # from too much Maulwurf traffic or overcrowding, either way it caves in
             infest_direction = random.choice(available_directions) # randomly selects direction out of valid ones
             if infest_direction == "north":
                 if map[tilePos[1] - 1][tilePos[0]].hasMaulwurf: # if the tile already has Maulwurf
                     tilePos = [tilePos[1] - 1, tilePos[0]] # that tile becomes the tile we are looking at, loops
                 else: # if it doesn't have Maulwurf
-                    map[tilePos[1] - 1][tilePos[0]].setMaulwurfStatus(True, player.pos) # now it does
+                    kick_player(map[tilePos[1] - 1][tilePos[0]].setMaulwurfStatus(True, player.pos)) # now it does
                     break
             elif infest_direction == "south":
                 if map[tilePos[1] + 1][tilePos[0]].hasMaulwurf: # if the tile already has Maulwurf
                     tilePos = [tilePos[1] + 1, tilePos[0]] # that tile becomes the tile we are looking at, loops
                 else: # if it doesn't have Maulwurf
-                    map[tilePos[1] + 1][tilePos[0]].setMaulwurfStatus(True, player.pos) # now it does
+                    kick_player(map[tilePos[1] + 1][tilePos[0]].setMaulwurfStatus(True, player.pos)) # now it does
                     break
             elif infest_direction == "east":
                 if map[tilePos[1]][tilePos[0] + 1].hasMaulwurf: # if the tile already has Maulwurf
                     tilePos = [tilePos[1], tilePos[0] + 1] # that tile becomes the tile we are looking at, loops
                 else: # if it doesn't have Maulwurf
-                    map[tilePos[1]][tilePos[0] + 1].setMaulwurfStatus(True, player.pos) # now it does
+                    kick_player(map[tilePos[1]][tilePos[0] + 1].setMaulwurfStatus(True, player.pos)) # now it does
                     break
             else: # for when the direction is "west"
                 if map[tilePos[1]][tilePos[0] - 1].hasMaulwurf: # if the tile already has Maulwurf
                     tilePos = [tilePos[1], tilePos[0] - 1] # that tile becomes the tile we are looking at, loops
                 else: # if it doesn't have Maulwurf
-                    map[tilePos[1]][tilePos[0] - 1].setMaulwurfStatus(True, player.pos) # now it does
+                    kick_player(map[tilePos[1]][tilePos[0] - 1].setMaulwurfStatus(True, player.pos)) # now it does
                     break
 
 

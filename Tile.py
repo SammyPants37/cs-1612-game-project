@@ -27,7 +27,8 @@ class Tile():
         self.cavedIn = isCavedIn
         if player_pos == self.pos:
             print("Ow! The cavern you are in collapsed!")
-            # TODO: add function that randomly chooses a tile for the player to get kicked to, -1 action too
+            return True, player_pos # returns to function that randomly chooses a tile for the player to get kicked to
+        return False
 
     def drainMineral(self):
         self.resourceType = Minerals.mineralTypes.unminable
@@ -36,7 +37,8 @@ class Tile():
         self.hasMaulwurf = hasMaulwurf
         if player_pos == self.pos:
             print("Oh no! An overwhelming horde of Maulwurf flooded into the cave!")
-            # TODO: add function that randomly chooses a tile for the player to get kicked to, -1 action too
+            return True, player_pos # returns to function that randomly chooses a tile for the player to get kicked to
+        return False
 
     @override
     def __str__(self) -> str:
