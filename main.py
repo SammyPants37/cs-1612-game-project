@@ -33,10 +33,10 @@ def inspect_tile(tilePos: tuple[int, int]):
         print(f"While gleaming the mine for potential minerals, I found a {map[tilePos[1]][tilePos[0]].item.name} that I could grab if space allows")
 
 def check_pos(pos: tuple[int, int]): # didn't want player.pos in Tile.py
-    if map[pos[1]][pos[0]].hasMaulwurf or map[pos[1]][pos[0]].cavedIn:
-        if map[pos[1]][pos[0]].cavedIn:
+    if map[pos[1]][pos[0]].hasMaulwurf or map[pos[1]][pos[0]].cavedIn: #checks if the tile is valid
+        if map[pos[1]][pos[0]].cavedIn: # gives feedback if it is caved in
             print("Ow! The cavern you are in collapsed!")
-        elif map[pos[1]][pos[0]].hasMaulwurf:
+        elif map[pos[1]][pos[0]].hasMaulwurf: # if it is not caved in, gives feedback that there are Maulwurf
             print("Oh no! An overwhelming horde of Maulwurf flooded into the cave!")
 
         available_directions = []  # below checks to see if a given direction is valid, appending it if it is
