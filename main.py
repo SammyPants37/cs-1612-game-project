@@ -64,7 +64,7 @@ def showMap(map: list[list[Tile.Tile]]) -> None:
         line = ""
         for item in row:
             if item.pos == player.pos:
-                line += "P "
+                line += "\033[34mP\033[0m " # makes P (the player) cyan
             else:
                 line += str(item) + " "
         if workingRow  < len(Constants.mapExtras):
