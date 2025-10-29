@@ -106,7 +106,7 @@ def infest_tile(tilePos: tuple[int, int]):
                 available_directions.append("east")
             if tilePos[1] - 1 >= 0 and not map[tilePos[1]][tilePos[0] - 1].cavedIn:
                 available_directions.append("west")
-            if num_tries == mapWidth or len(available_directions) == 0: # if cap is reached, or there's no valid direction
+            if num_tries == (mapWidth - 1) or len(available_directions) == 0: # if cap is reached, or there's no valid direction
                 map[tilePos[1]][tilePos[0]].setCavedIn(True) # tile caves in
                 break # from too much Maulwurf traffic or overcrowding, either way it caves in
             infest_direction = random.choice(available_directions) # randomly selects direction out of valid ones
