@@ -1,5 +1,5 @@
 import random
-from Constants import Minerals
+from Constants import Minerals, mapHeight, mapWidth
 import Constants, Tile, Player
 
 # rest of code goes here
@@ -32,15 +32,108 @@ def inspect_tile(tilePos: tuple[int, int]):
     if map[tilePos[1]][tilePos[0]].item != map[tilePos[1]][tilePos[0]].item.nothing: #if there is an item on the player's tile
         print(f"While gleaming the mine for potential minerals, I found a {map[tilePos[1]][tilePos[0]].item.name} that I could grab if space allows")
 
+def check_pos(pos: tuple[int, int]): # didn't want player.pos in Tile.py
+    if map[pos[1]][pos[0]].hasMaulwurf or map[pos[1]][pos[0]].cavedIn: #checks if the tile is valid
+        if map[pos[1]][pos[0]].cavedIn: # gives feedback if it is caved in
+            print("Ow! The cavern you are in collapsed!")
+        elif map[pos[1]][pos[0]].hasMaulwurf: # if it is not caved in, gives feedback that there are Maulwurf
+            print("Oh no! An overwhelming horde of Maulwurf flooded into the cave!")
+
+        available_directions = []  # below checks to see if a given direction is valid, appending it if it is
+        if pos[1] - 1 >= 0 and not (map[pos[1] - 1][pos[0]].cavedIn or map[pos[1] - 1][pos[0]].hasMaulwurf):
+            available_directions.append("n")
+        if pos[1] + 1 < mapHeight and not (map[pos[1] + 1][pos[0]].cavedIn or map[pos[1] + 1][pos[0]].hasMaulwurf):
+            available_directions.append("s")
+        if pos[0] + 1 < mapWidth and not (map[pos[1]][pos[0] + 1].cavedIn or map[pos[1]][pos[0] + 1].hasMaulwurf):
+            available_directions.append("e")
+        if pos[1] - 1 >= 0 and not (map[pos[1]][pos[0] - 1].cavedIn or map[pos[1]][pos[0] - 1].hasMaulwurf):
+            available_directions.append("w")
+        if len(available_directions) == 0: # if there are no valid directions
+            global running
+            running = False
+            player.actions_left = 0
+            print("YOU DIED -- Score: 0 \nThank you for playing Maulwurf")
+        else:
+            move(random.choice(available_directions), map) # else a random direction is picked to move
+
+
 def occurrence_probability(numDays: int):
     possibleEvents = Constants.event_number_scaler(numDays) #sets number of events equal to the number off our formula
-    numEvents = 0
     while possibleEvents > 0: #while potential events haven't occurred
         event_occurred = random.randint(1,Constants.DenominatorEventsOccur) # DEO = 6
         if event_occurred == 1: # 1/6 chance of occurring
-            numEvents += 1
+            rand_event = random.randint(1, 2)
+            if rand_event == 1:
+                rand_den_infest()
+            else:
+                rand_cave_in()
         possibleEvents -= 1
-        # TODO: insert function here that picks the event that would occur (which leads to the specific event's output)
+
+def rand_cave_in():
+    unblocked_tiles = []
+    for h in range(mapHeight):
+        for w in range(mapWidth):
+            if not map[h][w].cavedIn:
+                unblocked_tiles.append([w, h])
+    if len(unblocked_tiles) == 0:
+        return # the player will be dead afterwards, so just in case the rare error I had occurs again
+    chosen_tile = random.choice(unblocked_tiles) # chooses an unblocked tile for a cave in to occur
+    map[chosen_tile[1]][chosen_tile[0]].setCavedIn(True)
+
+def rand_den_infest():
+    maulwurf_dens = []
+    for h in range(mapHeight):
+        for w in range(mapWidth):
+            if map[h][w].resourceType == Minerals.mineralTypes.monsterDen and not map[h][w].cavedIn:
+                maulwurf_dens.append([w, h])
+    if len(maulwurf_dens) > 0: # when there are unblocked dens
+        chosen_den = random.choice(maulwurf_dens) #choose one out of them to infest from
+        infest_tile(chosen_den)
+    else:
+        rand_cave_in() #when all the dens are blocked a cave in happens randomly instead
+
+def infest_tile(tilePos: tuple[int, int]):
+    if not map[tilePos[1]][tilePos[0]].hasMaulwurf: # if the den doesn't have Maulwurf on it
+      map[tilePos[1]][tilePos[0]].setMaulwurfStatus(True) # it does now
+    else: # else when it has Maulwurf (initially had a while loop, but there was a potential for an infinite loop)
+        for num_tries in range(mapWidth): # I chose mapWidth (which scales good enough) as the cap for looking for values
+            available_directions = [] # below checks to see if a given direction is valid, appending it if it is
+            if tilePos[1] - 1 >= 0 and not map[tilePos[1] - 1][tilePos[0]].cavedIn:
+                available_directions.append("north")
+            if tilePos[1] + 1 < mapHeight and not map[tilePos[1] + 1][tilePos[0]].cavedIn:
+                available_directions.append("south")
+            if tilePos[0] + 1 < mapWidth and not map[tilePos[1]][tilePos[0] + 1].cavedIn:
+                available_directions.append("east")
+            if tilePos[1] - 1 >= 0 and not map[tilePos[1]][tilePos[0] - 1].cavedIn:
+                available_directions.append("west")
+            if num_tries == (mapWidth - 1) or len(available_directions) == 0: # if cap is reached, or there's no valid direction
+                map[tilePos[1]][tilePos[0]].setCavedIn(True) # tile caves in
+                break # from too much Maulwurf traffic or overcrowding, either way it caves in
+            infest_direction = random.choice(available_directions) # randomly selects direction out of valid ones
+            if infest_direction == "north":
+                if map[tilePos[1] - 1][tilePos[0]].hasMaulwurf: # if the tile already has Maulwurf
+                    tilePos = [tilePos[1] - 1, tilePos[0]] # that tile becomes the tile we are looking at, loops
+                else: # if it doesn't have Maulwurf
+                    map[tilePos[1] - 1][tilePos[0]].setMaulwurfStatus(True) # now it does
+                    break
+            elif infest_direction == "south":
+                if map[tilePos[1] + 1][tilePos[0]].hasMaulwurf: # if the tile already has Maulwurf
+                    tilePos = [tilePos[1] + 1, tilePos[0]] # that tile becomes the tile we are looking at, loops
+                else: # if it doesn't have Maulwurf
+                    map[tilePos[1] + 1][tilePos[0]].setMaulwurfStatus(True) # now it does
+                    break
+            elif infest_direction == "east":
+                if map[tilePos[1]][tilePos[0] + 1].hasMaulwurf: # if the tile already has Maulwurf
+                    tilePos = [tilePos[1], tilePos[0] + 1] # that tile becomes the tile we are looking at, loops
+                else: # if it doesn't have Maulwurf
+                    map[tilePos[1]][tilePos[0] + 1].setMaulwurfStatus(True) # now it does
+                    break
+            else: # for when the direction is "west"
+                if map[tilePos[1]][tilePos[0] - 1].hasMaulwurf: # if the tile already has Maulwurf
+                    tilePos = [tilePos[1], tilePos[0] - 1] # that tile becomes the tile we are looking at, loops
+                else: # if it doesn't have Maulwurf
+                    map[tilePos[1]][tilePos[0] - 1].setMaulwurfStatus(True) # now it does
+                    break
 
 
 def generateMap() -> list[list[Tile.Tile]]:
@@ -91,12 +184,16 @@ def move(args: list[str], map: list[list[Tile.Tile]]):
         match arg:
             case "n" | "north":
                 newPos = (player.pos[0] + 0, player.pos[1] - 1)
+                arg = "North"
             case "s" | "south":
                 newPos = (player.pos[0] + 0, player.pos[1] + 1)
+                arg = "South"
             case "e" | "east":
                 newPos = (player.pos[0] + 1, player.pos[1] + 0)
+                arg = "East"
             case "w" | "west":
                 newPos = (player.pos[0] - 1, player.pos[1] + 0)
+                arg = "West"
             case _:
                 newPos = player.pos
 
@@ -114,7 +211,7 @@ def move(args: list[str], map: list[list[Tile.Tile]]):
             else:
                 player.pos = newPos #sets the player's position to the new one
                 player.actions_left -= 1 #takes away an action after the player has successfully moved
-                print(f"moved {arg}")
+                print(f"Moved {arg}")
         else:
             print("cannot move that direction")
     else:
@@ -191,5 +288,5 @@ while running:
     print("as you go to sleep for the evening, you hear the rumbles of change in the mines")
     occurrence_probability(daysPassed)
     daysPassed += 1
-    # TODO: add event generator when done
+    check_pos(player.pos) # checks if Maulwurf or CaveIn occurred on the player's tile, kicking them to a new tile if so
 
