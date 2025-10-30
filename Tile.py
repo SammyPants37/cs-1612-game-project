@@ -25,12 +25,20 @@ class Tile():
     
     def setCavedIn(self, isCavedIn: bool):
         self.cavedIn = isCavedIn
+        if isCavedIn: # if the tile is caved in
+            self.hasMaulwurf = not isCavedIn # Maulwurf are now killed
 
     def drainMineral(self):
         self.resourceType = Minerals.mineralTypes.unminable
 
     def setMaulwurfStatus(self, hasMaulwurf: bool):
         self.hasMaulwurf = hasMaulwurf
+
+    def check_(self, item: str) -> bool: # checks for Maulwurf or CaveIn depending on item inputted
+        if item in ("dynamite", "d"):
+            return self.cavedIn # returns whether it is cavedIn or not
+        else: # if item in ("weapon", "fight", "f", "battle", "b", "kill")
+            return self.hasMaulwurf # returns whether it has a Maulwurf
 
     @override
     def __str__(self) -> str:
