@@ -33,7 +33,17 @@ def inspect_tile(tilePos: tuple[int, int]):
         print(f"While gleaming the mine for potential minerals, I found a {map[tilePos[1]][tilePos[0]].item.name} that I could grab if space allows")
 
 def check_pos(pos: tuple[int, int]): # didn't want player.pos in Tile.py
-    if map[pos[1]][pos[0]].hasMaulwurf or map[pos[1]][pos[0]].cavedIn: #checks if the tile is valid
+    if map[pos[1]][pos[0]].isExit: # if the player is on the exit
+        answer = input("Do you want to escape the mountains? (Yes or No): ").strip().lower()
+        if answer in ("yes", "y", "escape", "exit", "e"):
+            player.exit_message()
+            running = False
+            player.actions_left = 0
+        elif answer in ("no", "n", "nope", "nada", "stay"):
+            print("You decide to continue mining... hopefully your greed doesn't get the best of you")
+        else:
+            print('Please input a valid answer. Enter "Exit" to try again')
+    elif map[pos[1]][pos[0]].hasMaulwurf or map[pos[1]][pos[0]].cavedIn: #checks if the tile is valid
         if map[pos[1]][pos[0]].cavedIn: # gives feedback if it is caved in
             print("Ow! The cavern you are in collapsed!")
         elif map[pos[1]][pos[0]].hasMaulwurf: # if it is not caved in, gives feedback that there are Maulwurf
@@ -171,7 +181,7 @@ def helpMenu():
     print("Rules                Move (n, s, e, w)           Grab\n"
           "Objective            Mine                        Dynamite\n"
           "Map                  Inspect                     Weapon\n"
-          "Help                 Quit (game, quit)")
+          "Help                 Quit (game, quit)           Escape")
 
 
 def move(args: list[str], map: list[list[Tile.Tile]]):
@@ -257,6 +267,8 @@ def handleInput(input: str):
         case "help":
             # show the help menu when the help command is run
             helpMenu()
+        case "exit" | "escape":
+            check_pos(player.pos)
         case "quit" | "q":
             if not set(arguments).isdisjoint(["quit", "yes", "y", "q", "game"]):
                 print("Thank you for playing Zwerg. Goodbye!")
