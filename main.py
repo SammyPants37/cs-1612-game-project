@@ -167,11 +167,12 @@ def showMap(map: list[list[Tile.Tile]]) -> None:
 
 
 def helpMenu():
+    alignmentString = "{:<10s} {:<20s} {:<10s}"
     print("Welcome to the game! Here are some inputs you can use")
-    print("Rules                Move (n, s, e, w)           Grab\n"
-          "Objective            Mine                        Dynamite\n"
-          "Map                  Inspect                     Weapon\n"
-          "Help                 Quit (game, quit)		 inventory")
+    print(alignmentString.format("Rules", "Move (n, s, e, w)", "Grab") + "\n" +
+          alignmentString.format("Objective", "Mine", "Dynamite") + "\n" +
+          alignmentString.format("Map", "Inspect", "Weapon") + "\n" +
+          alignmentString.format("Help", "Quit (game, quit)", "Inventory"))
 
 
 def move(args: list[str], map: list[list[Tile.Tile]]):
