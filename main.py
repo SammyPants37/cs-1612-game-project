@@ -228,11 +228,9 @@ def handleInput(input: str):
         arguments.append("")
     match command:
         case "rules" | "r":
-            # TODO: add rules function when implemented
-            pass
+            Constants.game_rules()
         case "objective" | "lore" | "o" | "l":
-            # TODO: add objective defining function when implemented
-            pass
+            Constants.game_objective()
         case "move":
             move(arguments, map)
         case "n" | "s" | "e" | "w" | "north" | "south" | "east" | "west":
