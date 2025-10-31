@@ -90,4 +90,5 @@ def game_rules():
           "\033[32mmost common minerals\033[0m to find. Collecting \033[32mrare minerals\033[0m, like \033[32mdiamonds\033[0m, give a much \033[32mhigher\n"
           "score\033[0m. \033[34mInspecting a tile is a useful way to gleam what could be on the tile\033[0m, and whether it\n"
           "is worth the \033[35mtime\033[0m and \033[35mactions\033[0m it takes to mine. However, \033[33mdon't think\033[0m seeing a \033[32mdiamond\033[0m listed\n"
-          "as one of three possibilities means there is a \033[33m1/3rd chance\033[0m to get it... its probably \033[32mcoal\033[0m.\n")
+          "as one of three possibilities means there is a \033[33m1/3rd chance\033[0m to get it... its probably \033[32mcoal\033[0m.\n"
+          "Once (\033[31mif\033[0m) you make it to the \033[36mexit\033[0m, input \033[36mEscape to exit the mountains\033[0m with your \033[32mfortune\033[0m!")
