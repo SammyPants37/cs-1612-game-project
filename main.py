@@ -177,11 +177,12 @@ def showMap(map: list[list[Tile.Tile]]) -> None:
 
 
 def helpMenu():
+    alignmentString = "{:<10s} {:<20s} {:<10s}"
     print("Welcome to the game! Here are some inputs you can use")
-    print("Rules                Move (n, s, e, w)           Grab\n"
-          "Objective            Mine                        Dynamite\n"
-          "Map                  Inspect                     Weapon\n"
-          "Help                 Quit (game, quit)           Escape")
+    print(alignmentString.format("Rules", "Move (n, s, e, w)", "Grab") + "\n" +
+          alignmentString.format("Objective", "Mine", "Use (dynamite, weapon)" + "\n" +
+          alignmentString.format("Map", "Inspect", "Inventory") + "\n" +
+          alignmentString.format("Help", "Quit (game, quit)", "Escape"))
 
 
 def move(args: list[str], map: list[list[Tile.Tile]]):
@@ -228,6 +229,10 @@ def move(args: list[str], map: list[list[Tile.Tile]]):
         print(f"move: unknown argument \"{arg}\". Valid arguments include n, s, e, w, north, south, east, or west")
 
 
+def showInventory():
+    for i in range(len(player.items)):
+        print(f"{i+1}: {player.items[i].name}")
+
 
 def handleInput(input: str):
     global running
@@ -265,6 +270,8 @@ def handleInput(input: str):
         case "help":
             # show the help menu when the help command is run
             helpMenu()
+        case "inventory":
+            showInventory()
         case "exit" | "escape":
             check_pos(player.pos)
         case "quit" | "q":
