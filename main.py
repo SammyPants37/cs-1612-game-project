@@ -224,6 +224,7 @@ def move(args: list[str], map: list[list[Tile.Tile]]):
                 player.pos = newPos #sets the player's position to the new one
                 player.actions_left -= 1 #takes away an action after the player has successfully moved
                 print(f"Moved {arg}")
+                inspect_tile(player.pos)
         else:
             print("cannot move that direction")
     else:
