@@ -1,5 +1,5 @@
 import random
-from Constants import Minerals, mapHeight, mapWidth
+from Constants import Minerals, mapHeight, mapWidth, ItemLimit
 import Constants, Tile, Player
 
 # rest of code goes here
@@ -9,23 +9,23 @@ def drop_item(tilePos: tuple[int, int]):
     dropped_item: Constants.Items = player.grab_item(map[tilePos[1]][tilePos[0]].item)
     map[tilePos[1]][tilePos[0]].setItem(dropped_item) # sets the tile to the dropped item (sometimes nothing)
 
-def use_item(item: str, args: list[str], pos: tuple[int, int]):
+def use_item(item: Constants.Items, args: list[str], pos: tuple[int, int]):
     arg = args[0] #copied from move function
     if len(args) > 1:
         print("all arguments past the first one have been discarded")
 
     available_directions = [] # skeleton based off the check_pos function
     desired_pos = dict() # create dictionary to associate direction with map direction (iteration from player.pos)
-    if pos[1] - 1 >= 0 and map[pos[1] - 1][pos[0]].check_(item):
+    if pos[1] - 1 >= 0 and map[pos[1] - 1][pos[0]].is_usable(item):
         available_directions.append("n")
         desired_pos["n"] = map[pos[1] - 1][pos[0]]
-    if pos[1] + 1 < mapHeight and map[pos[1] + 1][pos[0]].check_(item):
+    if pos[1] + 1 < mapHeight and map[pos[1] + 1][pos[0]].is_usable(item):
         available_directions.append("s")
         desired_pos["s"] = map[pos[1] + 1][pos[0]]
-    if pos[0] + 1 < mapWidth and map[pos[1]][pos[0] + 1].check_(item):
+    if pos[0] + 1 < mapWidth and map[pos[1]][pos[0] + 1].is_usable(item):
         available_directions.append("e")
         desired_pos["e"] = map[pos[1]][pos[0] + 1]
-    if pos[1] - 1 >= 0 and map[pos[1]][pos[0] - 1].check_(item):
+    if pos[1] - 1 >= 0 and map[pos[1]][pos[0] - 1].is_usable(item):
         available_directions.append("w")
         desired_pos["w"] = map[pos[1]][pos[0] - 1]
 
@@ -39,25 +39,29 @@ def use_item(item: str, args: list[str], pos: tuple[int, int]):
                 direction = "e"
             case "w" | "west":
                 direction = "w"
-            case _:
-                direction = "invalid"
         if len(available_directions) == 0 or direction not in available_directions: # if given direction is invalid
-            return print(f"Sorry, you can't use {item} in the direction:", f' "{arg}"')
-    else:
-        return print(f"Please specify direction when using {item} (n, s, e, w)")
-
-    said_pos = desired_pos[direction] # created variable to simplify text
-    for given_item in player.items:  # iterates over all items in inventory
-        if given_item == Constants.Items.nothing: # stops nothing items from being compared in said_pos.check_()
-            continue # dynamite and weapons are now opposite bools for the said tiles here, so they can be compared
-        elif said_pos.check_(given_item.name) == said_pos.check_(item):  # if the item you are on is the item you are using
-            player.items[player.items.index(given_item)] = Constants.Items.nothing  # 1st item found is replaced by nothing
-            said_pos.setCavedIn(False) # either makes a tile not caved in (or does nothing)
-            said_pos.setMaulwurfStatus(False) # removes Maulwurf from a tile (cave ins now kill Maulwurf underneath)
-            player.actions_left -= 1 # -1 for using the item, -1 for moving
+            return print(f"Sorry, you can't use {item.name} in the direction:", f' "{arg}"')
+        else:
+            desired_pos[direction].setCavedIn(False)
+            desired_pos[direction].setMaulwurfStatus(False)
+            player.actions_left -= 1  # -1 for using the item, -1 for moving
             move(list(direction), map)
-            return print(f"{item} used")
-    return print(f"Sorry, there are no {item}s in your inventory")
+            return print(f"{item.name} used")
+    else:
+        return print(f"Please specify direction when using {item.name} (n, s, e, w)")
+
+def check_inventory_for(item: str, args: list[str]):
+    if item in ("dynamite", "d"):
+        item = Constants.Items.dynamite
+    elif item in ("weapon", "fight", "f", "battle", "b", "kill"):
+        item = Constants.Items.weapon
+    else:
+        return print(f"Invalid request: You can't use {item} as an item")
+    for player_item in player.items:  # iterates over all items in inventory
+        if player_item == item:  # if the item that the iteration is on is the item you are using
+            player.items[player.items.index(player_item)] = Constants.Items.nothing  # 1st item found is replaced by nothing
+            return use_item(item, args, player.pos)
+    return print(f"Sorry, there are no {item.name}s in your inventory")
 
 
 def mineTile(tilePos: tuple[int, int]):
@@ -245,8 +249,7 @@ def move(args: list[str], map: list[list[Tile.Tile]]):
             case "w" | "west":
                 newPos = (player.pos[0] - 1, player.pos[1] + 0)
                 arg = "West"
-            case _:
-                newPos = player.pos
+
 
         YCordValid: bool = newPos[1] >= 0 and newPos[1] < Constants.mapHeight
         XCordValid: bool = newPos[0] >= 0 and newPos[0] < Constants.mapWidth
@@ -298,7 +301,21 @@ def handleInput(input: str):
         case "grab" | "pick" | "g" | "p":
             drop_item(player.pos)
         case "dynamite" | "d" | "weapon" | "fight" | "f" | "battle" | "b" | "kill": # combined for minimized code
-            use_item(command, arguments, player.pos)
+            check_inventory_for(command, arguments)
+        case "use":
+            item = arguments[0]
+            arguments = arguments[1:]
+            if len(arguments) == 0:
+                arguments.append("")
+            try: item = int(item)
+            except ValueError: # isinstance(item, str):
+                check_inventory_for(item, arguments)
+            if isinstance(item, int):
+                if 0 < item <= ItemLimit:
+                    use_item(player.items[item - 1], arguments, player.pos)
+                else:
+                    print(f"When using item inventory location, please input a number between 1 and {ItemLimit}")
+
         case "help":
             # show the help menu when the help command is run
             helpMenu()

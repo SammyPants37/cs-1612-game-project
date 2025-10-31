@@ -34,11 +34,13 @@ class Tile():
     def setMaulwurfStatus(self, hasMaulwurf: bool):
         self.hasMaulwurf = hasMaulwurf
 
-    def check_(self, item: str) -> bool: # checks for Maulwurf or CaveIn depending on item inputted
-        if item in ("dynamite", "d"):
+    def is_usable(self, item: Constants.Items) -> bool: # checks for Maulwurf or CaveIn depending on item inputted
+        if item == Constants.Items.dynamite:
             return self.cavedIn # returns whether it is cavedIn or not
-        else: # if item in ("weapon", "fight", "f", "battle", "b", "kill")
+        elif item == Constants.Items.weapon:
             return self.hasMaulwurf # returns whether it has a Maulwurf
+        else: # item == Constants.Items.nothing:
+            return False
 
     @override
     def __str__(self) -> str:
