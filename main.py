@@ -14,6 +14,7 @@ def mineTile(tilePos: tuple[int, int]):
     player.add_score(tileMineral)
     map[tilePos[1]][tilePos[0]].drainMineral()
     print(tileMineral.miningDescription)
+    print(f"{tileMineral.description} mined")
 
 
 def inspect_tile(tilePos: tuple[int, int]):
@@ -33,6 +34,7 @@ def inspect_tile(tilePos: tuple[int, int]):
         print(f"While gleaming the mine for potential minerals, I found a {map[tilePos[1]][tilePos[0]].item.name} that I could grab if space allows")
 
 def check_pos(pos: tuple[int, int]): # didn't want player.pos in Tile.py
+    global running
     if map[pos[1]][pos[0]].isExit: # if the player is on the exit
         answer = input("Do you want to escape the mountains? (Yes or No): ").strip().lower()
         if answer in ("yes", "y", "escape", "exit", "e"):
@@ -59,7 +61,6 @@ def check_pos(pos: tuple[int, int]): # didn't want player.pos in Tile.py
         if pos[1] - 1 >= 0 and not (map[pos[1]][pos[0] - 1].cavedIn or map[pos[1]][pos[0] - 1].hasMaulwurf):
             available_directions.append("w")
         if len(available_directions) == 0: # if there are no valid directions
-            global running
             running = False
             player.actions_left = 0
             print("YOU DIED -- Score: 0 \nThank you for playing Maulwurf")
@@ -182,7 +183,7 @@ def helpMenu():
     print(alignmentString.format("Rules", "Move (n, s, e, w)", "Grab") + "\n" +
           alignmentString.format("Objective", "Mine", "Use (dynamite, weapon)" + "\n" +
           alignmentString.format("Map", "Inspect", "Inventory") + "\n" +
-          alignmentString.format("Help", "Quit (game, quit)", "Escape"))
+          alignmentString.format("Help", "Quit (game, quit)", "Escape")))
 
 
 def move(args: list[str], map: list[list[Tile.Tile]]):
@@ -290,7 +291,6 @@ daysPassed = 0
 player: Player.Player = Player.Player()
 map = generateMap()
 running = True
-
 
 helpMenu()
 
