@@ -171,7 +171,7 @@ def helpMenu():
     print("Rules                Move (n, s, e, w)           Grab\n"
           "Objective            Mine                        Dynamite\n"
           "Map                  Inspect                     Weapon\n"
-          "Help                 Quit (game, quit)")
+          "Help                 Quit (game, quit)		 inventory")
 
 
 def move(args: list[str], map: list[list[Tile.Tile]]):
@@ -218,6 +218,10 @@ def move(args: list[str], map: list[list[Tile.Tile]]):
         print(f"move: unknown argument \"{arg}\". Valid arguments include n, s, e, w, north, south, east, or west")
 
 
+def showInventory():
+    for i in range(len(player.items)):
+        print(f"{i+1}: {player.items[i].name}")
+
 
 def handleInput(input: str):
     global running
@@ -257,6 +261,8 @@ def handleInput(input: str):
         case "help":
             # show the help menu when the help command is run
             helpMenu()
+        case "inventory":
+            showInventory()
         case "quit" | "q":
             if not set(arguments).isdisjoint(["quit", "yes", "y", "q", "game"]):
                 print("Thank you for playing Zwerg. Goodbye!")
