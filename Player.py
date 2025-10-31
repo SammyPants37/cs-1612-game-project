@@ -18,6 +18,12 @@ class Player:
         self.minerals_in_bag.append(new_mineral) #adds mineral to bag
         self.total_score += new_mineral.score_value #adds mineral's score to total
 
+    def exit_message(self):
+        print("Congratulations -- you successfully escaped the mountains with your life!")
+        print(f"Score: {self.total_score}")
+        # TODO: add specialized messages based on score
+        # TODO: save and show game stats and prompt to "play again?"
+
     def setPos(self, pos: tuple[int, int]):
         self.pos = pos
 

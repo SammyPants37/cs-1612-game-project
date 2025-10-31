@@ -41,13 +41,19 @@ class Tile():
                 if self.cavedIn:
                     return "\033[31m#\033[0m" # returns # in red
                 elif self.hasMaulwurf:
+                    if self.resourceType == Minerals.mineralTypes.monsterDen:
+                        return "\033[35mD\033[0m" # returns D in purple
                     return "\033[33mM\033[0m" # returns M in yellow
+                elif self.item != Constants.Items.nothing:
+                    bgrd = "\033[100m"
+                else:
+                    bgrd = ""
                 match self.resourceType:
                     case Minerals.mineralTypes.unminable:
-                        return "\033[37m_\033[0m" # returns _ in gray
+                        return f"{bgrd}\033[37m_\033[0m" # returns _ in gray
                     case Minerals.mineralTypes.monsterDen:
-                        return "\033[35mD\033[0m" # returns D in purple
+                        return f"{bgrd}\033[35mD\033[0m" # returns D in purple
                     case _:
-                        return "\033[32mO\033[0m" # returns O in green
+                        return f"{bgrd}\033[32mO\033[0m" # returns O in green
             else:
                 return "?"
