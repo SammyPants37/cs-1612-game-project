@@ -9,58 +9,67 @@ def drop_item(tilePos: tuple[int, int]):
     dropped_item: Constants.Items = player.grab_item(map[tilePos[1]][tilePos[0]].item)
     map[tilePos[1]][tilePos[0]].setItem(dropped_item) # sets the tile to the dropped item (sometimes nothing)
 
-def use_item(item: Constants.Items, args: list[str], pos: tuple[int, int]):
-    arg = args[0] #copied from move function
-    if len(args) > 1:
-        print("all arguments past the first one have been discarded")
-
+def check_direction_item_used(item: Constants.Items, direction: str, pos: tuple[int, int]):
     available_directions = [] # skeleton based off the check_pos function
-    desired_pos = dict() # create dictionary to associate direction with map direction (iteration from player.pos)
+    desired_pos = dict() # create dictionary to associate direction with a tile (iteration from player.pos)
     if pos[1] - 1 >= 0 and map[pos[1] - 1][pos[0]].is_usable(item):
-        available_directions.append("n")
-        desired_pos["n"] = map[pos[1] - 1][pos[0]]
+        available_directions.append("north")
+        desired_pos["north"] = [pos[0], pos[1] - 1] # made dictionary store coords instead of map pos
     if pos[1] + 1 < mapHeight and map[pos[1] + 1][pos[0]].is_usable(item):
-        available_directions.append("s")
-        desired_pos["s"] = map[pos[1] + 1][pos[0]]
+        available_directions.append("south")
+        desired_pos["south"] = [pos[0], pos[1] + 1]
     if pos[0] + 1 < mapWidth and map[pos[1]][pos[0] + 1].is_usable(item):
-        available_directions.append("e")
-        desired_pos["e"] = map[pos[1]][pos[0] + 1]
+        available_directions.append("east")
+        desired_pos["east"] = [pos[0] + 1, pos[1]]
     if pos[1] - 1 >= 0 and map[pos[1]][pos[0] - 1].is_usable(item):
-        available_directions.append("w")
-        desired_pos["w"] = map[pos[1]][pos[0] - 1]
+        available_directions.append("west")
+        desired_pos["west"] = [pos[0] - 1, pos[1]]
 
-    if arg in ["n", "s", "e", "w", "north", "south", "east", "west"]: # skeleton based off the move function
-        match arg:
+    if direction not in available_directions: # if given direction is invalid
+            print(f"Sorry, you can't use {item.name} in the direction: {direction}")
+    else: # only output first letter for direction to make it valid for move function
+        check_inventory_for(item, desired_pos[direction], list(direction)[0]) # next, check the inventory for the item
+
+def simplify_item_inputs(command_args: list): # handling 3 arguments was too bulky with old processing system
+    item = []
+    direction = []
+    for commands in command_args: # basically copied skeleton of handleInput function
+        commands = commands.lower().strip()
+        try: commands = int(commands)
+        except ValueError:
+            isinstance(commands, str)
+        if isinstance(commands, int):
+            if 0 < commands <= ItemLimit:
+                command_args.append(player.items[commands - 1].name) # adds item to command based on slot
+            else:
+                print(f"Number detected: to use item inventory location, please input a slot number between 1 and {ItemLimit}")
+        match commands: # filters nonimportant commands out, sorts item commands and direction commands
+            case "dynamite" | "d":
+                item.append(Constants.Items.dynamite)
+            case "weapon" | "fight" | "f" | "battle" | "b" | "kill":
+                item.append(Constants.Items.weapon)
             case "n" | "north":
-                direction = "n"
+                direction.append("north")
             case "s" | "south":
-                direction = "s"
+                direction.append("south")
             case "e" | "east":
-                direction = "e"
+                direction.append("east")
             case "w" | "west":
-                direction = "w"
-        if len(available_directions) == 0 or direction not in available_directions: # if given direction is invalid
-            return print(f"Sorry, you can't use {item.name} in the direction:", f' "{arg}"')
-        else:
-            desired_pos[direction].setCavedIn(False)
-            desired_pos[direction].setMaulwurfStatus(False)
-            player.actions_left -= 1  # -1 for using the item, -1 for moving
-            move(list(direction), map)
-            return print(f"{item.name} used")
+                direction.append("west")
+    if len(item) == 1 and len(direction) == 1: # checks for only 1 command for each
+        check_direction_item_used(item[0], direction[0], player.pos) # proceed to check for a valid direction
     else:
-        return print(f"Please specify direction when using {item.name} (n, s, e, w)")
+        print("Please input a single valid item to use and a single valid direction to use it")
 
-def check_inventory_for(item: str, args: list[str]):
-    if item in ("dynamite", "d"):
-        item = Constants.Items.dynamite
-    elif item in ("weapon", "fight", "f", "battle", "b", "kill"):
-        item = Constants.Items.weapon
-    else:
-        return print(f"Invalid request: You can't use {item} as an item")
+def check_inventory_for(item: Constants.Items, tilePos: tuple[int, int], direction: str):
     for player_item in player.items:  # iterates over all items in inventory
         if player_item == item:  # if the item that the iteration is on is the item you are using
             player.items[player.items.index(player_item)] = Constants.Items.nothing  # 1st item found is replaced by nothing
-            return use_item(item, args, player.pos)
+            map[tilePos[1]][tilePos[0]].setCavedIn(False)
+            map[tilePos[1]][tilePos[0]].setMaulwurfStatus(False)
+            player.actions_left -= 1  # -1 for using the item, -1 for moving
+            move(list(direction), map)
+            return print(f"{item.name} used")
     return print(f"Sorry, there are no {item.name}s in your inventory")
 
 
@@ -250,7 +259,6 @@ def move(args: list[str], map: list[list[Tile.Tile]]):
                 newPos = (player.pos[0] - 1, player.pos[1] + 0)
                 arg = "West"
 
-
         YCordValid: bool = newPos[1] >= 0 and newPos[1] < Constants.mapHeight
         XCordValid: bool = newPos[0] >= 0 and newPos[0] < Constants.mapWidth
         if YCordValid and XCordValid:
@@ -300,22 +308,8 @@ def handleInput(input: str):
             showMap(map)
         case "grab" | "pick" | "g" | "p":
             drop_item(player.pos)
-        case "dynamite" | "d" | "weapon" | "fight" | "f" | "battle" | "b" | "kill": # combined for minimized code
-            check_inventory_for(command, arguments)
-        case "use":
-            item = arguments[0]
-            arguments = arguments[1:]
-            if len(arguments) == 0:
-                arguments.append("")
-            try: item = int(item)
-            except ValueError: # isinstance(item, str):
-                check_inventory_for(item, arguments)
-            if isinstance(item, int):
-                if 0 < item <= ItemLimit:
-                    use_item(player.items[item - 1], arguments, player.pos)
-                else:
-                    print(f"When using item inventory location, please input a number between 1 and {ItemLimit}")
-
+        case "use" | "dynamite" | "d" | "weapon" | "fight" | "f" | "battle" | "b" | "kill":
+            simplify_item_inputs(input.split(" ")[0:])
         case "help":
             # show the help menu when the help command is run
             helpMenu()
@@ -326,6 +320,9 @@ def handleInput(input: str):
                 player.actions_left = 0
             else:
                 print("Are you sure you would like to quit? Progress will not be saved...\n(Please type in Quit Game to confirm).")
+        case "z": # got sick of spamming mine
+            if Constants.devMode:
+                player.actions_left -= 12
         case _:
             print(f"mine game: {command}: not found.")
 
