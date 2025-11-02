@@ -99,52 +99,49 @@ def rand_den_infest():
                 maulwurf_dens.append([w, h])
     if len(maulwurf_dens) > 0: # when there are unblocked dens
         chosen_den = random.choice(maulwurf_dens) #choose one out of them to infest from
-        infest_tile(chosen_den)
+        if not map[chosen_den[1]][chosen_den[0]].hasMaulwurf:  # if the den doesn't have Maulwurf on it
+            map[chosen_den[1]][chosen_den[0]].setMaulwurfStatus(True)  # it does now
+        else: # else when it has Maulwurf
+            tries_left = mapWidth # I chose mapWidth (which scales good enough) as the cap for looking for values
+            infest_tile(chosen_den, tries_left) # I thought recursion was a more appropriate looping mechanism
     else:
         rand_cave_in() #when all the dens are blocked a cave in happens randomly instead
 
-def infest_tile(tilePos: tuple[int, int]):
-    if not map[tilePos[1]][tilePos[0]].hasMaulwurf: # if the den doesn't have Maulwurf on it
-      map[tilePos[1]][tilePos[0]].setMaulwurfStatus(True) # it does now
-    else: # else when it has Maulwurf (initially had a while loop, but there was a potential for an infinite loop)
-        for num_tries in range(mapWidth): # I chose mapWidth (which scales good enough) as the cap for looking for values
-            available_directions = [] # below checks to see if a given direction is valid, appending it if it is
-            if tilePos[1] - 1 >= 0 and not map[tilePos[1] - 1][tilePos[0]].cavedIn:
-                available_directions.append("north")
-            if tilePos[1] + 1 < mapHeight and not map[tilePos[1] + 1][tilePos[0]].cavedIn:
-                available_directions.append("south")
-            if tilePos[0] + 1 < mapWidth and not map[tilePos[1]][tilePos[0] + 1].cavedIn:
-                available_directions.append("east")
-            if tilePos[1] - 1 >= 0 and not map[tilePos[1]][tilePos[0] - 1].cavedIn:
-                available_directions.append("west")
-            if num_tries == (mapWidth - 1) or len(available_directions) == 0: # if cap is reached, or there's no valid direction
-                map[tilePos[1]][tilePos[0]].setCavedIn(True) # tile caves in
-                break # from too much Maulwurf traffic or overcrowding, either way it caves in
-            infest_direction = random.choice(available_directions) # randomly selects direction out of valid ones
-            if infest_direction == "north":
-                if map[tilePos[1] - 1][tilePos[0]].hasMaulwurf: # if the tile already has Maulwurf
-                    tilePos = [tilePos[1] - 1, tilePos[0]] # that tile becomes the tile we are looking at, loops
-                else: # if it doesn't have Maulwurf
-                    map[tilePos[1] - 1][tilePos[0]].setMaulwurfStatus(True) # now it does
-                    break
-            elif infest_direction == "south":
-                if map[tilePos[1] + 1][tilePos[0]].hasMaulwurf: # if the tile already has Maulwurf
-                    tilePos = [tilePos[1] + 1, tilePos[0]] # that tile becomes the tile we are looking at, loops
-                else: # if it doesn't have Maulwurf
-                    map[tilePos[1] + 1][tilePos[0]].setMaulwurfStatus(True) # now it does
-                    break
-            elif infest_direction == "east":
-                if map[tilePos[1]][tilePos[0] + 1].hasMaulwurf: # if the tile already has Maulwurf
-                    tilePos = [tilePos[1], tilePos[0] + 1] # that tile becomes the tile we are looking at, loops
-                else: # if it doesn't have Maulwurf
-                    map[tilePos[1]][tilePos[0] + 1].setMaulwurfStatus(True) # now it does
-                    break
-            else: # for when the direction is "west"
-                if map[tilePos[1]][tilePos[0] - 1].hasMaulwurf: # if the tile already has Maulwurf
-                    tilePos = [tilePos[1], tilePos[0] - 1] # that tile becomes the tile we are looking at, loops
-                else: # if it doesn't have Maulwurf
-                    map[tilePos[1]][tilePos[0] - 1].setMaulwurfStatus(True) # now it does
-                    break
+def infest_tile(tilePos: tuple[int, int], tries_left: int):
+        available_directions = [] # below checks to see if a given direction is valid, appending it if it is
+        if tilePos[1] - 1 >= 0 and not map[tilePos[1] - 1][tilePos[0]].cavedIn:
+            available_directions.append("north")
+        if tilePos[1] + 1 < mapHeight and not map[tilePos[1] + 1][tilePos[0]].cavedIn:
+            available_directions.append("south")
+        if tilePos[0] + 1 < mapWidth and not map[tilePos[1]][tilePos[0] + 1].cavedIn:
+            available_directions.append("east")
+        if tilePos[0] - 1 >= 0 and not map[tilePos[1]][tilePos[0] - 1].cavedIn:
+            available_directions.append("west")
+
+        if tries_left == 0 or len(available_directions) == 0: # if cap is reached, or there's no valid direction
+            map[tilePos[1]][tilePos[0]].setCavedIn(True) # tile caves in
+
+        infest_direction = random.choice(available_directions) # randomly selects direction out of valid ones
+        if infest_direction == "north":
+            if map[tilePos[1] - 1][tilePos[0]].hasMaulwurf: # if the tile already has Maulwurf
+                infest_tile((tilePos[0], tilePos[1] - 1), tries_left - 1) # we now infest that tile
+            else: # if it doesn't have Maulwurf
+                map[tilePos[1] - 1][tilePos[0]].setMaulwurfStatus(True) # now it does
+        elif infest_direction == "south":
+            if map[tilePos[1] + 1][tilePos[0]].hasMaulwurf: # if the tile already has Maulwurf
+                infest_tile((tilePos[0], tilePos[1] + 1), tries_left - 1) # we now infest that tile
+            else: # if it doesn't have Maulwurf
+                map[tilePos[1] + 1][tilePos[0]].setMaulwurfStatus(True) # now it does
+        elif infest_direction == "east":
+            if map[tilePos[1]][tilePos[0] + 1].hasMaulwurf: # if the tile already has Maulwurf
+                infest_tile((tilePos[0] + 1, tilePos[1]), tries_left - 1) # we now infest that tile
+            else: # if it doesn't have Maulwurf
+                map[tilePos[1]][tilePos[0] + 1].setMaulwurfStatus(True) # now it does
+        else: # for when the direction is "west"
+            if map[tilePos[1]][tilePos[0] - 1].hasMaulwurf: # if the tile already has Maulwurf
+                infest_tile((tilePos[0] - 1, tilePos[1]), tries_left - 1) # we now infest that tile
+            else: # if it doesn't have Maulwurf
+                map[tilePos[1]][tilePos[0] - 1].setMaulwurfStatus(True) # now it does
 
 
 def generateMap() -> list[list[Tile.Tile]]:
