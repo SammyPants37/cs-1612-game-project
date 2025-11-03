@@ -36,7 +36,7 @@ class Minerals:
             print(Minerals.mineralTypes.diamond.description) # Diamond
             print(Minerals.mineralTypes.diamond.score_value) # 100000 """
 
-devMode = True # added devMode to check if things are working as expected easier
+devMode = False # added devMode to check if things are working as expected easier
 ItemLimit = 3
 NumPlayerMoves = 3
 DenominatorEventsOccur = 6 # in case we would like to change the 1/6th chance they occur separately
