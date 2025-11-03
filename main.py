@@ -176,37 +176,34 @@ def showMap(map: list[list[Tile.Tile]]) -> None:
         print(line)
         workingRow += 1
 
-def show_mini_map(map: list[list[Tile.Tile]], pos: tuple[int, int]) -> None:
-    row_coords = list(range(0, mapHeight)) # start with all tile coords
-    item_coords = list(range(0,mapWidth))
-    # based on the player.pos, delete the coords that will be displayed
-    if pos[1] in (range(5)):
-        del row_coords[0:10]
-    elif pos[1] in (range((mapHeight - 5), mapHeight)):
-        del row_coords[(mapHeight - 10):mapHeight]
-    else:
-        del row_coords[pos[1] - 5: pos[1] + 5]
-    if pos[0] in (range(5)):
-        del item_coords[0:10]
+def show_mini_map(map: list[list[Tile.Tile]], pos: tuple[int, int]) -> None: # skeleton based off of showMap function
+    if pos[1] in (range(5)): # defines which rows will be shown on the mini map based off player.pos
+        row_coords = list(range(0, 10)) # first case is for when the player is near the top of the map
+    elif pos[1] in (range((mapHeight - 5), mapHeight)): # then when the player is near the bottom
+        row_coords = list(range((mapHeight - 10), mapHeight))
+    else: # lastly, all in between positions are defined directly from player.pos
+        row_coords = list(range((pos[1] - 5), (pos[1] + 5)))
+    if pos[0] in (range(5)): # defines which item will be shown on the mini map based off player.pos (similar way to row)
+        item_coords = list(range(0, 10))
     elif pos[0] in (range((mapWidth - 5), mapWidth)):
-        del item_coords[(mapWidth - 10):mapWidth]
+        item_coords = list(range((mapWidth - 10), mapWidth))
     else:
-        del item_coords[pos[0] - 5: pos[0] + 5]
+        item_coords = list(range((pos[0] - 5), (pos[0] + 5)))
 
-    row_counter = 0 # to keep track which coord number for the rows we are on
+    row_count = 0 # to keep track which coord number for the rows we are on
     workingRow = 0
     for row in map:
-        if row_counter in row_coords:
-            row_counter += 1 # row counts up either way
-            continue #skips over iterations left in the list
+        if row_count not in row_coords: # if the row is not in the minimap
+            row_count += 1 # row counts up either way
+            continue # skip over that iteration
         line = ""
-        row_counter += 1
-        item_counter = 0 # to keep track which coord number for the item we are on
+        row_count += 1 # row counts up coinciding with row
+        item_count = 0 # to keep track which coord number for the item we are on
         for item in row: # mimics what I did for row
-            if item_counter in item_coords:
-                item_counter += 1
+            if item_count not in item_coords: # same as row but for item
+                item_count += 1
                 continue
-            item_counter += 1
+            item_count += 1
             if item.pos == player.pos:
                 line += "\033[34mP\033[0m " # makes P (the player) cyan
             else:
