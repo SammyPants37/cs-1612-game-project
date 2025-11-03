@@ -247,6 +247,8 @@ def handleInput(input: str):
             Constants.game_rules()
         case "objective" | "lore" | "o" | "l":
             Constants.game_objective()
+        case "maulwurf" | "read" | "continue":
+            Constants.entry_counter += Constants.maulwurf_description(Constants.entry_counter)
         case "move":
             move(arguments, map)
         case "n" | "s" | "e" | "w" | "north" | "south" | "east" | "west":
