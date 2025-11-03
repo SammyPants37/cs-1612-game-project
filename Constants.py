@@ -61,8 +61,8 @@ mapExtras = [
     "	\033[100m \033[0m: tile has item"]
 # refer to Tile.py, in @override to see comments for each symbol's color, main.py showMap for P
 
-mapWidth = 25
-mapHeight = 25
+mapWidth = 25 # must be greater than 10
+mapHeight = 25 # must be greater than 10
 
 def game_objective():
     print("\033[34mYou are an aspiring dwarf\033[0m native to the Great Northern Mountains, being born\n"

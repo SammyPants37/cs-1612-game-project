@@ -176,6 +176,46 @@ def showMap(map: list[list[Tile.Tile]]) -> None:
         print(line)
         workingRow += 1
 
+def show_mini_map(map: list[list[Tile.Tile]], pos: tuple[int, int]) -> None:
+    row_coords = list(range(0, mapHeight)) # start with all tile coords
+    item_coords = list(range(0,mapWidth))
+    # based on the player.pos, delete the coords that will be displayed
+    if pos[1] in (range(5)):
+        del row_coords[0:10]
+    elif pos[1] in (range((mapHeight - 5), mapHeight)):
+        del row_coords[(mapHeight - 10):mapHeight]
+    else:
+        del row_coords[pos[1] - 5: pos[1] + 5]
+    if pos[0] in (range(5)):
+        del item_coords[0:10]
+    elif pos[0] in (range((mapWidth - 5), mapWidth)):
+        del item_coords[(mapWidth - 10):mapWidth]
+    else:
+        del item_coords[pos[0] - 5: pos[0] + 5]
+
+    row_counter = 0 # to keep track which coord number for the rows we are on
+    workingRow = 0
+    for row in map:
+        if row_counter in row_coords:
+            row_counter += 1 # row counts up either way
+            continue #skips over iterations left in the list
+        line = ""
+        row_counter += 1
+        item_counter = 0 # to keep track which coord number for the item we are on
+        for item in row: # mimics what I did for row
+            if item_counter in item_coords:
+                item_counter += 1
+                continue
+            item_counter += 1
+            if item.pos == player.pos:
+                line += "\033[34mP\033[0m " # makes P (the player) cyan
+            else:
+                line += str(item) + " "
+        if workingRow  < len(Constants.mapExtras):
+            line += Constants.mapExtras[workingRow]
+        print(line)
+        workingRow += 1
+
 
 def helpMenu():
     alignmentString = "{:<10s} {:<20s} {:<10s}"
@@ -250,8 +290,10 @@ def handleInput(input: str):
             Constants.game_objective()
         case "move":
             move(arguments, map)
+            show_mini_map(map, player.pos)
         case "n" | "s" | "e" | "w" | "north" | "south" | "east" | "west":
             move(list(command), map)
+            show_mini_map(map, player.pos)
         case "mine" | "m":
             player.actions_left -= 1
             mineTile(player.pos)
