@@ -37,8 +37,9 @@ class Tile():
     def is_usable(self, item: Constants.Items) -> bool: # checks for Maulwurf or CaveIn depending on item inputted
         if item == Constants.Items.dynamite:
             return self.cavedIn # returns whether it is cavedIn or not
-        else: # elif item == Constants.Items.weapon:
+        elif item == Constants.Items.weapon:
             return self.hasMaulwurf # returns whether it has a Maulwurf
+        return False
 
     @override
     def __str__(self) -> str:
