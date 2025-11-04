@@ -93,3 +93,33 @@ def game_rules():
           "is worth the \033[35mtime\033[0m and \033[35mactions\033[0m it takes to mine. However, \033[33mdon't think\033[0m seeing a \033[32mdiamond\033[0m listed\n"
           "as one of three possibilities means there is a \033[33m1/3rd chance\033[0m to get it... its probably \033[32mcoal\033[0m.\n"
           "Once (\033[31mif\033[0m) you make it to the \033[36mexit\033[0m, input \033[36mEscape to exit the mountains\033[0m with your \033[32mfortune\033[0m!")
+
+entry_counter = 0
+def maulwurf_description(entry_num):
+    description_list = ("A Maulwurf is a large, monstrous creature at least twice the size of man, where the\naverage size of an adult is a little bigger than that of an adult gorilla.",
+                        "Maulwurf typically travel and live alone, but may gather in large,unstoppable\nhordes once in a frenzy.",
+                        "They have long snouts that extend out into a shape reminiscent of a lizard's\nskull, with nose slits like that of a horse.",
+                        "A distinguishing trait is their two frontal mole-like buck teeth used to chop\noff large chunks of minerals, with venom injecting fangs to the right and left of them.",
+                        "Each fang secretes a saliva like substance that liquefies rocks and bones,\nsoftens crystals, and hardens flesh.",
+                        "Never does a man fear death more than when he stares down the jaws of a Maulwurf,\none can only imagine the pain of their torso being ripped clean off...",
+                        "One can only imagine their spine leaking out instead of blood, with the victim's\nflesh drooping until it hardens into stone.",
+                        "Inside of their mouth is an endless array of molar teeth that scatter together like a mesh.",
+                        "They pulverize their meals by pushing up the bottom of their jaw, like a wave\nrising up, to grind against the dipping roof of their mouth.",
+                        "The side cheeks push in opposite of the roof and floor as they drop back down,\ncrushing everything in a rhythmic spasm.",
+                        "Their main body is much like that of a mole, a long chest and torso that stretches\ndown to two squatting legs.",
+                        "These hind legs are slightly more elongated than a normal mole, and are bendable\nat a knee, allowing the Maulwurf to stand.",
+                        "Their hind claws, as do their frontal claws, match their eyes, which reflect with\na crimson hue reminiscent of rubies and blood.",
+                        "These large powerful claws are only slightly tinier than their heads when compacted\ntogether, but can spread to nearly twice the size.",
+                        "These sharp, deadly scoops could stab straight through a man’s stomach,\nor an iron-laced door for that matter.",
+                        "They are held up by strong, gorilla-like arms that are used as a brace when\nthey stalk slowly as a sentinel would.",
+                        "When they run or dig they go on their belly and lead with their snouts, using their\nlarge arms to pull themselves forward like they are swimming through air.",
+                        "Their dark brown, almost black, fur is hardened and encrusted with\ncrumbs of stone latching onto each hair.",
+                        "The only way to kill a Maulwurf is to use a reliable weapon to puncture its skull\nthrough its eye socket, though even their brains wear down a weapon given enough time.",
+                        "Their corpses are littered too little with rare minerals to be worth hardly anything\nthough, a bigger prize would be a Maulwurf’s egg.",
+                        "Their hard exteriors are riddled with a variety of rare minerals and stones, which\nmake it a highly prized trophy that any race would respect due to the hazards it takes to collect.",
+                        "No one’s yet figured out how to eat it though, or make it hatch for that matter.",
+                        "Would make one wonder whether it's an egg at all if the Maulwurf didn’t guard them so ferociously....")
+    print(f"--Entry #{entry_num}--\n{description_list[entry_num]}\n--Reinput to continue reading--")
+    if entry_num == 22:
+        return -22
+    return 1
