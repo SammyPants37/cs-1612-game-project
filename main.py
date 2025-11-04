@@ -250,39 +250,39 @@ def move(args: list[str], map: list[list[Tile.Tile]]):
     arg = args[0]
     if len(args) > 1:
         print("all arguments past the first one have been discarded")
-    if arg in ["n", "s", "e", "w", "north", "south", "east", "west"]:
-        newPos: tuple[int, int] = (0, 0)
-        match arg:
-            case "n" | "north":
-                newPos = (player.pos[0] + 0, player.pos[1] - 1)
-                arg = "North"
-            case "s" | "south":
-                newPos = (player.pos[0] + 0, player.pos[1] + 1)
-                arg = "South"
-            case "e" | "east":
-                newPos = (player.pos[0] + 1, player.pos[1] + 0)
-                arg = "East"
-            case "w" | "west":
-                newPos = (player.pos[0] - 1, player.pos[1] + 0)
-                arg = "West"
-
-        YCordValid: bool = newPos[1] >= 0 and newPos[1] < Constants.mapHeight
-        XCordValid: bool = newPos[0] >= 0 and newPos[0] < Constants.mapWidth
-        if YCordValid and XCordValid:
-            map[newPos[1]][newPos[0]].isDiscovered = True #makes it so the tile is discovered if the coords are valid
-            # happens regardless if the tile is cavedIn or hasMaulwurf, makes so they will show up on map
-            if map[newPos[1]][newPos[0]].cavedIn:
-                #tells the player if the tile has caved in, makes it show on map, hints at dynamite
-                print("It seems the cave has caved in that way... dynamite would be useful here")
-            elif map[newPos[1]][newPos[0]].hasMaulwurf:
-                #tells the player if the tile has Maulwurf, makes it show on map, hints at weapon
-                print("Terrible growling rings through the cavern that way, alongside a waft of blood... only a weapon would allow continuation")
-            else:
-                player.pos = newPos #sets the player's position to the new one
-                player.actions_left -= 1 #takes away an action after the player has successfully moved
-                print(f"Moved {arg}")
-        else:
+    newPos: tuple[int, int] = (0, 0)
+    match arg:
+        case "n" | "north":
+            newPos = (player.pos[0] + 0, player.pos[1] - 1)
+            arg = "North"
+        case "s" | "south":
+            newPos = (player.pos[0] + 0, player.pos[1] + 1)
+            arg = "South"
+        case "e" | "east":
+            newPos = (player.pos[0] + 1, player.pos[1] + 0)
+            arg = "East"
+        case "w" | "west":
+            newPos = (player.pos[0] - 1, player.pos[1] + 0)
+            arg = "West"
+        case _:
             print("cannot move that direction")
+            return
+
+    YCordValid: bool = newPos[1] >= 0 and newPos[1] < Constants.mapHeight
+    XCordValid: bool = newPos[0] >= 0 and newPos[0] < Constants.mapWidth
+    if YCordValid and XCordValid:
+        map[newPos[1]][newPos[0]].isDiscovered = True #makes it so the tile is discovered if the coords are valid
+        # happens regardless if the tile is cavedIn or hasMaulwurf, makes so they will show up on map
+        if map[newPos[1]][newPos[0]].cavedIn:
+            #tells the player if the tile has caved in, makes it show on map, hints at dynamite
+            print("It seems the cave has caved in that way... dynamite would be useful here")
+        elif map[newPos[1]][newPos[0]].hasMaulwurf:
+            #tells the player if the tile has Maulwurf, makes it show on map, hints at weapon
+            print("Terrible growling rings through the cavern that way, alongside a waft of blood... only a weapon would allow continuation")
+        else:
+            player.pos = newPos #sets the player's position to the new one
+            player.actions_left -= 1 #takes away an action after the player has successfully moved
+            print(f"Moved {arg}")
     else:
         print(f"move: unknown argument \"{arg}\". Valid arguments include n, s, e, w, north, south, east, or west")
 
