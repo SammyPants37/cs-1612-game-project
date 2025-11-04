@@ -15,7 +15,7 @@ class Tile():
         self.resourceType: Minerals.mineralTypes = resourceType
         self.fakeTypes: list[Minerals.mineralTypes] = fakeTypes
         self.cavedIn: bool = False
-        self.isDiscovered: bool = False
+        self.isDiscovered: bool = Constants.devMode # all tiles are pre-discovered in devMode
         self.isExit: bool = isExit
         self.hasMaulwurf: bool = False
         self.item: Constants.Items = Constants.Items.nothing
@@ -25,12 +25,21 @@ class Tile():
     
     def setCavedIn(self, isCavedIn: bool):
         self.cavedIn = isCavedIn
+        if isCavedIn: # if the tile is caved in
+            self.hasMaulwurf = not isCavedIn # Maulwurf are now killed
 
     def drainMineral(self):
         self.resourceType = Minerals.mineralTypes.unminable
 
     def setMaulwurfStatus(self, hasMaulwurf: bool):
         self.hasMaulwurf = hasMaulwurf
+
+    def is_usable(self, item: Constants.Items) -> bool: # checks for Maulwurf or CaveIn depending on item inputted
+        if item == Constants.Items.dynamite:
+            return self.cavedIn # returns whether it is cavedIn or not
+        elif item == Constants.Items.weapon:
+            return self.hasMaulwurf # returns whether it has a Maulwurf
+        return False
 
     @override
     def __str__(self) -> str:

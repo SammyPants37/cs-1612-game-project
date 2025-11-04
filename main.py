@@ -1,5 +1,5 @@
 import random
-from Constants import Minerals, mapHeight, mapWidth
+from Constants import Minerals, mapHeight, mapWidth, ItemLimit
 import Constants, Tile, Player
 
 # rest of code goes here
@@ -8,6 +8,77 @@ def drop_item(tilePos: tuple[int, int]):
     # grab_item takes the player's tile's item, spits out whatever will have to be dropped
     dropped_item: Constants.Items = player.grab_item(map[tilePos[1]][tilePos[0]].item)
     map[tilePos[1]][tilePos[0]].setItem(dropped_item) # sets the tile to the dropped item (sometimes nothing)
+
+
+def useItem(args: list[str], playerPos: tuple[int, int]):
+    global player
+    itemIndex = args[0]
+
+    if len(args) > 1:
+        direction = args[1]
+    else:
+        print("missing arguement for direction to use the item.")
+        return
+
+    if itemIndex.isdigit():
+        itemIndex = int(itemIndex) - 1
+    else:
+        print("please input a number as the first arguement to specify the item to use")
+        return
+
+    if itemIndex < 0 or itemIndex > ItemLimit - 1:
+        print(f"argument 1 needs to be within 1 and {ItemLimit}")
+        return
+
+    item = player.items[itemIndex]
+
+    itemUsable: bool = False
+
+    match direction:
+        case "n" | "north":
+            if playerPos[1] > 0:
+                if map[playerPos[1] - 1][playerPos[0]].is_usable(item):
+                    if item == Constants.Items.dynamite:
+                        map[playerPos[1] - 1][playerPos[0]].setCavedIn(False)
+                    elif item == Constants.Items.weapon:
+                        map[playerPos[1] - 1][playerPos[0]].setMaulwurfStatus(False)
+                    itemUsable = True
+        case "s" | "south":
+            if playerPos[1] < mapHeight - 1:
+                if map[playerPos[1] + 1][playerPos[0]].is_usable(item):
+                    if item == Constants.Items.dynamite:
+                        map[playerPos[1] + 1][playerPos[0]].setCavedIn(False)
+                    elif item == Constants.Items.weapon:
+                        map[playerPos[1] + 1][playerPos[0]].setMaulwurfStatus(False)
+                    itemUsable = True
+        case "e" | "east":
+            if playerPos[0] < mapWidth - 1:
+                if map[playerPos[1]][playerPos[0] + 1].is_usable(item):
+                    if item == Constants.Items.dynamite:
+                        map[playerPos[1]][playerPos[0] + 1].setCavedIn(False)
+                    elif item == Constants.Items.weapon:
+                        map[playerPos[1]][playerPos[0] + 1].setMaulwurfStatus(False)
+                    itemUsable = True
+        case "w" | "west":
+            if playerPos[0] > 0:
+                if map[playerPos[1]][playerPos[0] - 1].is_usable(item):
+                    if item == Constants.Items.dynamite:
+                        map[playerPos[1]][playerPos[0] - 1].setCavedIn(False)
+                    elif item == Constants.Items.weapon:
+                        map[playerPos[1]][playerPos[0] - 1].setMaulwurfStatus(False)
+                    itemUsable = True
+        case _:
+            print("Please input a valid direction. Valid directions include north, south, east, and west.")
+
+    if itemUsable:
+        print(f"Used {item.name}")
+        player.items[itemIndex] = Constants.Items.nothing
+        player.actions_left -= 1
+        move([direction], map)
+    else:
+        print("Item is not useable in that direction.")
+            
+
 
 def mineTile(tilePos: tuple[int, int]):
     tileMineral: Minerals.mineralTypes = map[tilePos[1]][tilePos[0]].resourceType
@@ -191,45 +262,41 @@ def move(args: list[str], map: list[list[Tile.Tile]]):
     arg = args[0]
     if len(args) > 1:
         print("all arguments past the first one have been discarded")
-    if arg in ["n", "s", "e", "w", "north", "south", "east", "west"]:
-        newPos: tuple[int, int] = (0, 0)
-        match arg:
-            case "n" | "north":
-                newPos = (player.pos[0] + 0, player.pos[1] - 1)
-                arg = "North"
-            case "s" | "south":
-                newPos = (player.pos[0] + 0, player.pos[1] + 1)
-                arg = "South"
-            case "e" | "east":
-                newPos = (player.pos[0] + 1, player.pos[1] + 0)
-                arg = "East"
-            case "w" | "west":
-                newPos = (player.pos[0] - 1, player.pos[1] + 0)
-                arg = "West"
-            case _:
-                newPos = player.pos
+    newPos: tuple[int, int] = (0, 0)
+    match arg:
+        case "n" | "north":
+            newPos = (player.pos[0] + 0, player.pos[1] - 1)
+            arg = "North"
+        case "s" | "south":
+            newPos = (player.pos[0] + 0, player.pos[1] + 1)
+            arg = "South"
+        case "e" | "east":
+            newPos = (player.pos[0] + 1, player.pos[1] + 0)
+            arg = "East"
+        case "w" | "west":
+            newPos = (player.pos[0] - 1, player.pos[1] + 0)
+            arg = "West"
+        case _:
+            print(f"move: unknown argument \"{arg}\". Valid arguments include n, s, e, w, north, south, east, or west")
+            return
 
-        YCordValid: bool = newPos[1] >= 0 and newPos[1] < Constants.mapHeight
-        XCordValid: bool = newPos[0] >= 0 and newPos[0] < Constants.mapWidth
-        if YCordValid and XCordValid:
-            map[newPos[1]][newPos[0]].isDiscovered = True #makes it so the tile is discovered if the coords are valid
-            # happens regardless if the tile is cavedIn or hasMaulwurf, makes so they will show up on map
-            if map[newPos[1]][newPos[0]].cavedIn:
-                #tells the player if the tile has caved in, makes it show on map, hints at dynamite
-                print("It seems the cave has caved in that way... dynamite would be useful here")
-            elif map[newPos[1]][newPos[0]].hasMaulwurf:
-                #tells the player if the tile has Maulwurf, makes it show on map, hints at weapon
-                print("Terrible growling rings through the cavern that way, alongside a waft of blood... only a weapon would allow continuation")
-            else:
-                player.pos = newPos #sets the player's position to the new one
-                player.actions_left -= 1 #takes away an action after the player has successfully moved
-                print(f"Moved {arg}")
-                inspect_tile(player.pos)
+    YCordValid: bool = newPos[1] >= 0 and newPos[1] < Constants.mapHeight
+    XCordValid: bool = newPos[0] >= 0 and newPos[0] < Constants.mapWidth
+    if YCordValid and XCordValid:
+        map[newPos[1]][newPos[0]].isDiscovered = True #makes it so the tile is discovered if the coords are valid
+        # happens regardless if the tile is cavedIn or hasMaulwurf, makes so they will show up on map
+        if map[newPos[1]][newPos[0]].cavedIn:
+            #tells the player if the tile has caved in, makes it show on map, hints at dynamite
+            print("It seems the cave has caved in that way... dynamite would be useful here")
+        elif map[newPos[1]][newPos[0]].hasMaulwurf:
+            #tells the player if the tile has Maulwurf, makes it show on map, hints at weapon
+            print("Terrible growling rings through the cavern that way, alongside a waft of blood... only a weapon would allow continuation")
         else:
-            print("cannot move that direction")
+            player.pos = newPos #sets the player's position to the new one
+            player.actions_left -= 1 #takes away an action after the player has successfully moved
+            print(f"Moved {arg}")
     else:
-        print(f"move: unknown argument \"{arg}\". Valid arguments include n, s, e, w, north, south, east, or west")
-
+            print("cannot move that direction")
 
 def showInventory():
     for i in range(len(player.items)):
@@ -262,13 +329,21 @@ def handleInput(input: str):
         case "grab" | "pick" | "g" | "p":
             drop_item(player.pos)
         case "dynamite" | "d":
-            player.actions_left -= 2
-            # TODO: add dynamite (remove caved in tile) function when implemented
-            pass
+            try:
+                itemIndex = player.items.index(Constants.Items.dynamite)
+                arguments.insert(0, str(itemIndex + 1))
+                useItem(arguments, player.pos)
+            except ValueError:
+                print("no dynamite in inventory")
         case "weapon" | "fight" | "f" | "battle" | "b" | "kill":
-            player.actions_left -= 2
-            # TODO: add fight function when implemented
-            pass
+            try:
+                itemIndex = player.items.index(Constants.Items.weapon)
+                arguments.insert(0, str(itemIndex + 1))
+                useItem(arguments, player.pos)
+            except ValueError:
+                print("no weapon in inventory")
+        case "use":
+            useItem(arguments, player.pos)
         case "help":
             # show the help menu when the help command is run
             helpMenu()
@@ -283,6 +358,9 @@ def handleInput(input: str):
                 player.actions_left = 0
             else:
                 print("Are you sure you would like to quit? Progress will not be saved...\n(Please type in Quit Game to confirm).")
+        case "z": # got sick of spamming mine
+            if Constants.devMode:
+                player.actions_left -= 12
         case _:
             print(f"mine game: {command}: not found.")
 
