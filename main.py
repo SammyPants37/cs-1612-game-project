@@ -85,6 +85,7 @@ def mineTile(tilePos: tuple[int, int]):
     player.add_score(tileMineral)
     map[tilePos[1]][tilePos[0]].drainMineral()
     print(tileMineral.miningDescription)
+    print(f"{tileMineral.description} mined")
 
 
 def inspect_tile(tilePos: tuple[int, int]):
@@ -104,7 +105,18 @@ def inspect_tile(tilePos: tuple[int, int]):
         print(f"While gleaming the mine for potential minerals, I found a {map[tilePos[1]][tilePos[0]].item.name} that I could grab if space allows")
 
 def check_pos(pos: tuple[int, int]): # didn't want player.pos in Tile.py
-    if map[pos[1]][pos[0]].hasMaulwurf or map[pos[1]][pos[0]].cavedIn: #checks if the tile is valid
+    global running
+    if map[pos[1]][pos[0]].isExit: # if the player is on the exit
+        answer = input("Do you want to escape the mountains? (Yes or No): ").strip().lower()
+        if answer in ("yes", "y", "escape", "exit", "e"):
+            player.exit_message()
+            running = False
+            player.actions_left = 0
+        elif answer in ("no", "n", "nope", "nada", "stay"):
+            print("You decide to continue mining... hopefully your greed doesn't get the best of you")
+        else:
+            print('Please input a valid answer. Enter "Exit" to try again')
+    elif map[pos[1]][pos[0]].hasMaulwurf or map[pos[1]][pos[0]].cavedIn: #checks if the tile is valid
         if map[pos[1]][pos[0]].cavedIn: # gives feedback if it is caved in
             print("Ow! The cavern you are in collapsed!")
         elif map[pos[1]][pos[0]].hasMaulwurf: # if it is not caved in, gives feedback that there are Maulwurf
@@ -120,7 +132,6 @@ def check_pos(pos: tuple[int, int]): # didn't want player.pos in Tile.py
         if pos[1] - 1 >= 0 and not (map[pos[1]][pos[0] - 1].cavedIn or map[pos[1]][pos[0] - 1].hasMaulwurf):
             available_directions.append("w")
         if len(available_directions) == 0: # if there are no valid directions
-            global running
             running = False
             player.actions_left = 0
             print("YOU DIED -- Score: 0 \nThank you for playing Maulwurf")
@@ -238,11 +249,12 @@ def showMap(map: list[list[Tile.Tile]]) -> None:
 
 
 def helpMenu():
+    alignmentString = "{:<10s} {:<20s} {:<10s}"
     print("Welcome to the game! Here are some inputs you can use")
-    print("Rules                Move (n, s, e, w)           Grab\n"
-          "Objective            Mine                        Dynamite\n"
-          "Map                  Inspect                     Weapon\n"
-          "Help                 Quit (game, quit)")
+    print(alignmentString.format("Rules", "Move (n, s, e, w)", "Grab") + "\n" +
+          alignmentString.format("Objective", "Mine", "Use (dynamite, weapon)" + "\n" +
+          alignmentString.format("Map", "Inspect", "Inventory") + "\n" +
+          alignmentString.format("Help", "Quit (game, quit)", "Escape")))
 
 
 def move(args: list[str], map: list[list[Tile.Tile]]):
@@ -286,6 +298,10 @@ def move(args: list[str], map: list[list[Tile.Tile]]):
     else:
             print("cannot move that direction")
 
+def showInventory():
+    for i in range(len(player.items)):
+        print(f"{i+1}: {player.items[i].name}")
+
 
 def handleInput(input: str):
     global running
@@ -296,11 +312,9 @@ def handleInput(input: str):
         arguments.append("")
     match command:
         case "rules" | "r":
-            # TODO: add rules function when implemented
-            pass
+            Constants.game_rules()
         case "objective" | "lore" | "o" | "l":
-            # TODO: add objective defining function when implemented
-            pass
+            Constants.game_objective()
         case "move":
             move(arguments, map)
         case "n" | "s" | "e" | "w" | "north" | "south" | "east" | "west":
@@ -333,6 +347,10 @@ def handleInput(input: str):
         case "help":
             # show the help menu when the help command is run
             helpMenu()
+        case "inventory":
+            showInventory()
+        case "exit" | "escape":
+            check_pos(player.pos)
         case "quit" | "q":
             if not set(arguments).isdisjoint(["quit", "yes", "y", "q", "game"]):
                 print("Thank you for playing Zwerg. Goodbye!")
@@ -352,7 +370,6 @@ daysPassed = 0
 player: Player.Player = Player.Player()
 map = generateMap()
 running = True
-
 
 helpMenu()
 
