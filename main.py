@@ -26,7 +26,13 @@ def useItem(args: list[str], playerPos: tuple[int, int]):
         print("please input a number as the first arguement to specify the item to use")
         return
 
+    if itemIndex < 0 or itemIndex > ItemLimit - 1:
+        print(f"argument 1 needs to be within 1 and {ItemLimit}")
+        return
+
     item = player.items[itemIndex]
+
+    itemUsable: bool = False
 
     match direction:
         case "n" | "north":
@@ -36,13 +42,7 @@ def useItem(args: list[str], playerPos: tuple[int, int]):
                         map[playerPos[1] - 1][playerPos[0]].setCavedIn(False)
                     elif item == Constants.Items.weapon:
                         map[playerPos[1] - 1][playerPos[0]].setMaulwurfStatus(False)
-                    print("Item used.")
-                    player.actions_left -= 1
-                    move([direction], map)
-                    return
-                else:
-                    print("item is not useable in that direction.")
-                    return
+                    itemUsable = True
         case "s" | "south":
             if playerPos[1] < mapHeight - 1:
                 if map[playerPos[1] + 1][playerPos[0]].is_usable(item):
@@ -50,13 +50,7 @@ def useItem(args: list[str], playerPos: tuple[int, int]):
                         map[playerPos[1] + 1][playerPos[0]].setCavedIn(False)
                     elif item == Constants.Items.weapon:
                         map[playerPos[1] + 1][playerPos[0]].setMaulwurfStatus(False)
-                    print("Item used.")
-                    player.actions_left -= 1
-                    move([direction], map)
-                    return
-                else:
-                    print("item is not useable in that direction.")
-                    return
+                    itemUsable = True
         case "e" | "east":
             if playerPos[0] < mapWidth - 1:
                 if map[playerPos[1]][playerPos[0] + 1].is_usable(item):
@@ -64,13 +58,7 @@ def useItem(args: list[str], playerPos: tuple[int, int]):
                         map[playerPos[1]][playerPos[0] + 1].setCavedIn(False)
                     elif item == Constants.Items.weapon:
                         map[playerPos[1]][playerPos[0] + 1].setMaulwurfStatus(False)
-                    print("Item used.")
-                    player.actions_left -= 1
-                    move([direction], map)
-                    return
-                else:
-                    print("item is not useable in that direction.")
-                    return
+                    itemUsable = True
         case "w" | "west":
             if playerPos[0] > 0:
                 if map[playerPos[1]][playerPos[0] - 1].is_usable(item):
@@ -78,15 +66,18 @@ def useItem(args: list[str], playerPos: tuple[int, int]):
                         map[playerPos[1]][playerPos[0] - 1].setCavedIn(False)
                     elif item == Constants.Items.weapon:
                         map[playerPos[1]][playerPos[0] - 1].setMaulwurfStatus(False)
-                    print("Item used.")
-                    player.actions_left -= 1
-                    move([direction], map)
-                    return
-                else:
-                    print("item is not useable in that direction.")
-                    return
+                    itemUsable = True
         case _:
             print("Please input a valid direction. Valid directions include north, south, east, and west.")
+
+    if itemUsable:
+        print(f"Used {item.name}")
+        player.items[itemIndex] = Constants.Items.nothing
+        player.actions_left -= 1
+        move([direction], map)
+    else:
+        print("Item is not useable in that direction.")
+            
 
 
 def mineTile(tilePos: tuple[int, int]):
@@ -325,21 +316,19 @@ def handleInput(input: str):
         case "grab" | "pick" | "g" | "p":
             drop_item(player.pos)
         case "dynamite" | "d":
-            itemIndex = player.items.index(Constants.Items.dynamite)
-            print(itemIndex)
-            if itemIndex < 0:
-                print("no dynamite in inventory.")
-            else:
+            try:
+                itemIndex = player.items.index(Constants.Items.dynamite)
                 arguments.insert(0, str(itemIndex + 1))
                 useItem(arguments, player.pos)
+            except ValueError:
+                print("no dynamite in inventory")
         case "weapon" | "fight" | "f" | "battle" | "b" | "kill":
-            itemIndex = player.items.index(Constants.Items.weapon)
-            print(itemIndex)
-            if itemIndex < 0:
-                print("no weapons in inventory.")
-            else:
+            try:
+                itemIndex = player.items.index(Constants.Items.weapon)
                 arguments.insert(0, str(itemIndex + 1))
                 useItem(arguments, player.pos)
+            except ValueError:
+                print("no weapon in inventory")
         case "use":
             useItem(arguments, player.pos)
         case "help":
