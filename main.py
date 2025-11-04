@@ -265,7 +265,7 @@ def move(args: list[str], map: list[list[Tile.Tile]]):
             newPos = (player.pos[0] - 1, player.pos[1] + 0)
             arg = "West"
         case _:
-            print("cannot move that direction")
+            print(f"move: unknown argument \"{arg}\". Valid arguments include n, s, e, w, north, south, east, or west")
             return
 
     YCordValid: bool = newPos[1] >= 0 and newPos[1] < Constants.mapHeight
@@ -284,8 +284,7 @@ def move(args: list[str], map: list[list[Tile.Tile]]):
             player.actions_left -= 1 #takes away an action after the player has successfully moved
             print(f"Moved {arg}")
     else:
-        print(f"move: unknown argument \"{arg}\". Valid arguments include n, s, e, w, north, south, east, or west")
-
+            print("cannot move that direction")
 
 
 def handleInput(input: str):
