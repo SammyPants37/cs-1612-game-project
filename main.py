@@ -177,26 +177,26 @@ def showMap(map: list[list[Tile.Tile]]) -> None:
         workingRow += 1
 
 def show_mini_map(map: list[list[Tile.Tile]], pos: tuple[int, int]) -> None: # skeleton based off of showMap function
-    if pos[1] in (range(5)): # defines which rows will be shown on the mini map based off player.pos
-        row_coords = list(range(0, 10)) # first case is for when the player is near the top of the map
-    elif pos[1] in (range((mapHeight - 5), mapHeight)): # then when the player is near the bottom
-        row_coords = list(range((mapHeight - 10), mapHeight))
+    print("-----mini map-----")
+    if pos[1] in (range(3)): # defines which rows will be shown on the mini map based off player.pos
+        row_coords = list(range(0, 5)) # first case is for when the player is near the top of the map
+    elif pos[1] in (range((mapHeight - 3), mapHeight)): # then when the player is near the bottom
+        row_coords = list(range((mapHeight - 5), mapHeight))
     else: # lastly, all in between positions are defined directly from player.pos
-        row_coords = list(range((pos[1] - 5), (pos[1] + 5)))
-    if pos[0] in (range(5)): # defines which item will be shown on the mini map based off player.pos (similar way to row)
-        item_coords = list(range(0, 10))
-    elif pos[0] in (range((mapWidth - 5), mapWidth)):
-        item_coords = list(range((mapWidth - 10), mapWidth))
+        row_coords = list(range((pos[1] - 2), (pos[1] + 3)))
+    if pos[0] in (range(3)): # defines which item will be shown on the mini map based off player.pos (similar way to row)
+        item_coords = list(range(0, 5))
+    elif pos[0] in (range((mapWidth - 3), mapWidth)):
+        item_coords = list(range((mapWidth - 5), mapWidth))
     else:
-        item_coords = list(range((pos[0] - 5), (pos[0] + 5)))
+        item_coords = list(range((pos[0] - 2), (pos[0] + 3)))
 
     row_count = 0 # to keep track which coord number for the rows we are on
-    workingRow = 0
     for row in map:
         if row_count not in row_coords: # if the row is not in the minimap
             row_count += 1 # row counts up either way
             continue # skip over that iteration
-        line = ""
+        line = "    "
         row_count += 1 # row counts up coinciding with row
         item_count = 0 # to keep track which coord number for the item we are on
         for item in row: # mimics what I did for row
@@ -208,11 +208,8 @@ def show_mini_map(map: list[list[Tile.Tile]], pos: tuple[int, int]) -> None: # s
                 line += "\033[34mP\033[0m " # makes P (the player) cyan
             else:
                 line += str(item) + " "
-        if workingRow  < len(Constants.mapExtras):
-            line += Constants.mapExtras[workingRow]
         print(line)
-        workingRow += 1
-
+    print("------------------")
 
 def helpMenu():
     alignmentString = "{:<10s} {:<20s} {:<10s}"
