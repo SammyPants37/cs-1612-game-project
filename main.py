@@ -414,9 +414,9 @@ while running:
     player.actions_left += Constants.NumPlayerMoves #refunds 3 actions
     # run player moves
     while player.actions_left > 0:
+        check_pos(player.pos) # checks if Maulwurf or CaveIn occurred on the player's tile, kicking them to a new tile if so
         command = input(">>> ")
         handleInput(command)
-        check_pos(player.pos) # checks if Maulwurf or CaveIn occurred on the player's tile, kicking them to a new tile if so
 
     print("as you go to sleep for the evening, you hear the rumbles of change in the mines")
     occurrence_probability(daysPassed)
