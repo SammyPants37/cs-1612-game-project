@@ -51,11 +51,11 @@ def item_weights(): # to make items more or less common
 
 mapExtras = [
     "    Legend:",
-    f"    ?: unexplored tile {"N":^10}",
-    f"    \033[37m_\033[0m: unmineable tile {"ᐃ":^10}",
-    f"    \033[31m#\033[0m: caved in tile   {"W ᐊ ⚪ ᐅ E":^10}",
-    f"    \033[34mP\033[0m: player		  {"ᐁ":^10}",
-    f"    \033[32mO\033[0m: mineral tile    {"S":^10}",
+    f"    ?: unexplored tile {"N":^15}",
+    f"    \033[37m_\033[0m: unmineable tile {"ᐃ":^15}",
+    f"    \033[31m#\033[0m: caved in tile   {"W ᐊ ✪ ᐅ E":^15}",
+    f"    \033[34mP\033[0m: player          {"ᐁ":^15}",
+    f"    \033[32mO\033[0m: mineral tile    {"S":^15}",
     f"    \033[36mE\033[0m: exit/escape tile",
     f"    \033[33mM\033[0m: monster infested tile",
     f"    \033[35mD\033[0m: monster den tile",
