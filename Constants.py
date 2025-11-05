@@ -50,16 +50,16 @@ def item_weights(): # to make items more or less common
     return [40,5,5] # nothing, dynamite, weapon
 
 mapExtras = [
-    "	Legend:",
-    "	?: unexplored tile		     N",
-    "	\033[37m_\033[0m: unmineable tile		     ᐃ",
-    "	\033[31m#\033[0m: caved in tile		W ᐊ ⚪ ᐅ E",
-    "	\033[34mP\033[0m: player			         ᐁ",
-    "	\033[32mO\033[0m: mineral tile			     S",
-    "	\033[36mE\033[0m: exit/escape tile		",
-    "	\033[33mM\033[0m: monster infested tile",
-    "	\033[35mD\033[0m: monster den tile		",
-    "	\033[100m \033[0m: tile has item"]
+    "    Legend:",
+    f"    ?: unexplored tile {"N":^10}",
+    f"    \033[37m_\033[0m: unmineable tile {"ᐃ":^10}",
+    f"    \033[31m#\033[0m: caved in tile   {"W ᐊ ⚪ ᐅ E":^10}",
+    f"    \033[34mP\033[0m: player		  {"ᐁ":^10}",
+    f"    \033[32mO\033[0m: mineral tile    {"S":^10}",
+    f"    \033[36mE\033[0m: exit/escape tile",
+    f"    \033[33mM\033[0m: monster infested tile",
+    f"    \033[35mD\033[0m: monster den tile",
+    f"    \033[100m \033[0m: tile has item"]
 # refer to Tile.py, in @override to see comments for each symbol's color, main.py showMap for P
 
 mapWidth = 25 # must be greater than 5
