@@ -191,6 +191,7 @@ def infest_tile(tilePos: tuple[int, int], tries_left: int):
 
         if tries_left == 0 or len(available_directions) == 0: # if cap is reached, or there's no valid direction
             map[tilePos[1]][tilePos[0]].setCavedIn(True) # tile caves in
+            return
 
         infest_direction = random.choice(available_directions) # randomly selects direction out of valid ones
         if infest_direction == "north":

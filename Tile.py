@@ -51,7 +51,7 @@ class Tile():
                     return "\033[31m#\033[0m" # returns # in red
                 elif self.hasMaulwurf:
                     if self.resourceType == Minerals.mineralTypes.monsterDen:
-                        return "\033[35mD\033[0m" # returns D in purple
+                        return "\033[35mD\033[1:33m\u0336\033[0m" # returns D in purple with a bold yellow dash
                     return "\033[33mM\033[0m" # returns M in yellow
                 elif self.item != Constants.Items.nothing:
                     bgrd = "\033[100m"
