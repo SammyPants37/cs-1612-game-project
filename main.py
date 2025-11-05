@@ -179,31 +179,20 @@ def showMap(map: list[list[Tile.Tile]]) -> None:
 def show_mini_map(map: list[list[Tile.Tile]], pos: tuple[int, int]) -> None: # skeleton based off of showMap function
     print("-----mini map-----")
     if pos[1] in (range(3)): # defines which rows will be shown on the mini map based off player.pos
-        row_coords = list(range(0, 5)) # first case is for when the player is near the top of the map
+        row_bounds = (0, 5) # first case is for when the player is near the top of the map
     elif pos[1] in (range((mapHeight - 3), mapHeight)): # then when the player is near the bottom
-        row_coords = list(range((mapHeight - 5), mapHeight))
+        row_bounds = ((mapHeight - 5), mapHeight)
     else: # lastly, all in between positions are defined directly from player.pos
-        row_coords = list(range((pos[1] - 2), (pos[1] + 3)))
+        row_bounds = ((pos[1] - 2), (pos[1] + 3))
     if pos[0] in (range(3)): # defines which item will be shown on the mini map based off player.pos (similar way to row)
-        item_coords = list(range(0, 5))
+        item_bounds = (0, 5)
     elif pos[0] in (range((mapWidth - 3), mapWidth)):
-        item_coords = list(range((mapWidth - 5), mapWidth))
+        item_bounds = ((mapWidth - 5), mapWidth)
     else:
-        item_coords = list(range((pos[0] - 2), (pos[0] + 3)))
-
-    row_count = 0 # to keep track which coord number for the rows we are on
-    for row in map:
-        if row_count not in row_coords: # if the row is not in the minimap
-            row_count += 1 # row counts up either way
-            continue # skip over that iteration
+        item_bounds = ((pos[0] - 2), (pos[0] + 3))
+    for row in map[row_bounds[0]:row_bounds[1]]:
         line = "    "
-        row_count += 1 # row counts up coinciding with row
-        item_count = 0 # to keep track which coord number for the item we are on
-        for item in row: # mimics what I did for row
-            if item_count not in item_coords: # same as row but for item
-                item_count += 1
-                continue
-            item_count += 1
+        for item in row[item_bounds[0]:item_bounds[1]]: # mimics what I did for row
             if item.pos == player.pos:
                 line += "\033[34mP\033[0m " # makes P (the player) cyan
             else:
