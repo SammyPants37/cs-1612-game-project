@@ -244,6 +244,29 @@ def showMap(map: list[list[Tile.Tile]]) -> None:
         print(line)
         workingRow += 1
 
+def show_mini_map(map: list[list[Tile.Tile]], pos: tuple[int, int]) -> None: # skeleton based off of showMap function
+    print("-----mini map-----")
+    if pos[1] in (range(3)): # defines which rows will be shown on the mini map based off player.pos
+        row_bounds = (0, 5) # first case is for when the player is near the top of the map
+    elif pos[1] in (range((mapHeight - 3), mapHeight)): # then when the player is near the bottom
+        row_bounds = ((mapHeight - 5), mapHeight)
+    else: # lastly, all in between positions are defined directly from player.pos
+        row_bounds = ((pos[1] - 2), (pos[1] + 3))
+    if pos[0] in (range(3)): # defines which item will be shown on the mini map based off player.pos (similar way to row)
+        item_bounds = (0, 5)
+    elif pos[0] in (range((mapWidth - 3), mapWidth)):
+        item_bounds = ((mapWidth - 5), mapWidth)
+    else:
+        item_bounds = ((pos[0] - 2), (pos[0] + 3))
+    for row in map[row_bounds[0]:row_bounds[1]]:
+        line = "    "
+        for item in row[item_bounds[0]:item_bounds[1]]: # mimics what I did for row
+            if item.pos == player.pos:
+                line += "\033[34mP\033[0m " # makes P (the player) cyan
+            else:
+                line += str(item) + " "
+        print(line)
+    print("------------------")
 
 def helpMenu():
     alignmentString = "{:<10s} {:<20s} {:<10s}"
@@ -317,8 +340,10 @@ def handleInput(input: str):
             Constants.entry_counter += Constants.maulwurf_description(Constants.entry_counter)
         case "move":
             move(arguments, map)
+            show_mini_map(map, player.pos)
         case "n" | "s" | "e" | "w" | "north" | "south" | "east" | "west":
             move(list(command), map)
+            show_mini_map(map, player.pos)
         case "mine" | "m":
             player.actions_left -= 1
             mineTile(player.pos)
