@@ -1,18 +1,219 @@
 import random
-from Constants import Minerals
+from Constants import Minerals, mapHeight, mapWidth, ItemLimit
 import Constants, Tile, Player
 
 # rest of code goes here
 
+def drop_item(tilePos: tuple[int, int]):
+    # grab_item takes the player's tile's item, spits out whatever will have to be dropped
+    dropped_item: Constants.Items = player.grab_item(map[tilePos[1]][tilePos[0]].item)
+    map[tilePos[1]][tilePos[0]].setItem(dropped_item) # sets the tile to the dropped item (sometimes nothing)
+
+
+def useItem(args: list[str], playerPos: tuple[int, int]):
+    global player
+    itemIndex = args[0]
+
+    if len(args) > 1:
+        direction = args[1]
+    else:
+        print("missing arguement for direction to use the item.")
+        return
+
+    if itemIndex.isdigit():
+        itemIndex = int(itemIndex) - 1
+    else:
+        print("please input a number as the first arguement to specify the item to use")
+        return
+
+    if itemIndex < 0 or itemIndex > ItemLimit - 1:
+        print(f"argument 1 needs to be within 1 and {ItemLimit}")
+        return
+
+    item = player.items[itemIndex]
+
+    itemUsable: bool = False
+
+    match direction:
+        case "n" | "north":
+            if playerPos[1] > 0:
+                if map[playerPos[1] - 1][playerPos[0]].is_usable(item):
+                    if item == Constants.Items.dynamite:
+                        map[playerPos[1] - 1][playerPos[0]].setCavedIn(False)
+                    elif item == Constants.Items.weapon:
+                        map[playerPos[1] - 1][playerPos[0]].setMaulwurfStatus(False)
+                    itemUsable = True
+        case "s" | "south":
+            if playerPos[1] < mapHeight - 1:
+                if map[playerPos[1] + 1][playerPos[0]].is_usable(item):
+                    if item == Constants.Items.dynamite:
+                        map[playerPos[1] + 1][playerPos[0]].setCavedIn(False)
+                    elif item == Constants.Items.weapon:
+                        map[playerPos[1] + 1][playerPos[0]].setMaulwurfStatus(False)
+                    itemUsable = True
+        case "e" | "east":
+            if playerPos[0] < mapWidth - 1:
+                if map[playerPos[1]][playerPos[0] + 1].is_usable(item):
+                    if item == Constants.Items.dynamite:
+                        map[playerPos[1]][playerPos[0] + 1].setCavedIn(False)
+                    elif item == Constants.Items.weapon:
+                        map[playerPos[1]][playerPos[0] + 1].setMaulwurfStatus(False)
+                    itemUsable = True
+        case "w" | "west":
+            if playerPos[0] > 0:
+                if map[playerPos[1]][playerPos[0] - 1].is_usable(item):
+                    if item == Constants.Items.dynamite:
+                        map[playerPos[1]][playerPos[0] - 1].setCavedIn(False)
+                    elif item == Constants.Items.weapon:
+                        map[playerPos[1]][playerPos[0] - 1].setMaulwurfStatus(False)
+                    itemUsable = True
+        case _:
+            print("Please input a valid direction. Valid directions include north, south, east, and west.")
+
+    if itemUsable:
+        print(f"Used {item.name}")
+        player.items[itemIndex] = Constants.Items.nothing
+        player.actions_left -= 1
+        move([direction], map)
+    else:
+        print("Item is not useable in that direction.")
+            
+
+
+def mineTile(tilePos: tuple[int, int]):
+    tileMineral: Minerals.mineralTypes = map[tilePos[1]][tilePos[0]].resourceType
+    player.add_score(tileMineral)
+    map[tilePos[1]][tilePos[0]].drainMineral()
+    print(tileMineral.miningDescription)
+    print(f"{tileMineral.description} mined")
+
+
+def inspect_tile(tilePos: tuple[int, int]):
+    true_mineral = map[tilePos[1]][tilePos[0]].resourceType  #gives the real mineral
+    fake_mineral = map[tilePos[1]][tilePos[0]].fakeTypes # gives 2 fake minerals for the tile the player is on
+    true_mineral_pos = random.randint(1, 3)
+    # randomly generates a position for the real mineral every inspect, keeps order
+    if true_mineral_pos == 1:
+        said_mineral = [true_mineral, fake_mineral[0], fake_mineral[1]]
+    elif true_mineral_pos == 2:
+        said_mineral = [fake_mineral[1], true_mineral, fake_mineral[0]]
+    else:  # when true_mineral_pos is the 3rd position
+        said_mineral = [fake_mineral[0], fake_mineral[1], true_mineral]
+    print(f"Hmm... I think I could find {said_mineral[0].description}, {said_mineral[1].description}, or {said_mineral[2].description} in this segment of the mine")
+
+    if map[tilePos[1]][tilePos[0]].item != map[tilePos[1]][tilePos[0]].item.nothing: #if there is an item on the player's tile
+        print(f"While gleaming the mine for potential minerals, I found a {map[tilePos[1]][tilePos[0]].item.name} that I could grab if space allows")
+
+def check_pos(pos: tuple[int, int]): # didn't want player.pos in Tile.py
+    global running
+    if map[pos[1]][pos[0]].isExit: # if the player is on the exit
+        answer = input("Do you want to escape the mountains? (Yes or No): ").strip().lower()
+        if answer in ("yes", "y", "escape", "exit", "e"):
+            player.exit_message()
+            running = False
+            player.actions_left = 0
+        elif answer in ("no", "n", "nope", "nada", "stay"):
+            print("You decide to continue mining... hopefully your greed doesn't get the best of you")
+        else:
+            print('Please input a valid answer. Enter "Exit" to try again')
+    elif map[pos[1]][pos[0]].hasMaulwurf or map[pos[1]][pos[0]].cavedIn: #checks if the tile is valid
+        if map[pos[1]][pos[0]].cavedIn: # gives feedback if it is caved in
+            print("Ow! The cavern you are in collapsed!")
+        elif map[pos[1]][pos[0]].hasMaulwurf: # if it is not caved in, gives feedback that there are Maulwurf
+            print("Oh no! An overwhelming horde of Maulwurf flooded into the cave!")
+
+        available_directions = []  # below checks to see if a given direction is valid, appending it if it is
+        if pos[1] - 1 >= 0 and not (map[pos[1] - 1][pos[0]].cavedIn or map[pos[1] - 1][pos[0]].hasMaulwurf):
+            available_directions.append("n")
+        if pos[1] + 1 < mapHeight and not (map[pos[1] + 1][pos[0]].cavedIn or map[pos[1] + 1][pos[0]].hasMaulwurf):
+            available_directions.append("s")
+        if pos[0] + 1 < mapWidth and not (map[pos[1]][pos[0] + 1].cavedIn or map[pos[1]][pos[0] + 1].hasMaulwurf):
+            available_directions.append("e")
+        if pos[1] - 1 >= 0 and not (map[pos[1]][pos[0] - 1].cavedIn or map[pos[1]][pos[0] - 1].hasMaulwurf):
+            available_directions.append("w")
+        if len(available_directions) == 0: # if there are no valid directions
+            running = False
+            player.actions_left = 0
+            print("YOU DIED -- Score: 0 \nThank you for playing Maulwurf")
+        else:
+            move(random.choice(available_directions), map) # else a random direction is picked to move
+
+
 def occurrence_probability(numDays: int):
     possibleEvents = Constants.event_number_scaler(numDays) #sets number of events equal to the number off our formula
-    numEvents = 0
     while possibleEvents > 0: #while potential events haven't occurred
         event_occurred = random.randint(1,Constants.DenominatorEventsOccur) # DEO = 6
         if event_occurred == 1: # 1/6 chance of occurring
-            numEvents += 1
+            rand_event = random.randint(1, 2)
+            if rand_event == 1:
+                rand_den_infest()
+            else:
+                rand_cave_in()
         possibleEvents -= 1
-        # TODO: insert function here that picks the event that would occur (which leads to the specific event's output)
+
+def rand_cave_in():
+    unblocked_tiles = []
+    for h in range(mapHeight):
+        for w in range(mapWidth):
+            if not map[h][w].cavedIn:
+                unblocked_tiles.append([w, h])
+    if len(unblocked_tiles) == 0:
+        return # the player will be dead afterwards, so just in case the rare error I had occurs again
+    chosen_tile = random.choice(unblocked_tiles) # chooses an unblocked tile for a cave in to occur
+    map[chosen_tile[1]][chosen_tile[0]].setCavedIn(True)
+
+def rand_den_infest():
+    maulwurf_dens = []
+    for h in range(mapHeight):
+        for w in range(mapWidth):
+            if map[h][w].resourceType == Minerals.mineralTypes.monsterDen and not map[h][w].cavedIn:
+                maulwurf_dens.append([w, h])
+    if len(maulwurf_dens) > 0: # when there are unblocked dens
+        chosen_den = random.choice(maulwurf_dens) #choose one out of them to infest from
+        if not map[chosen_den[1]][chosen_den[0]].hasMaulwurf:  # if the den doesn't have Maulwurf on it
+            map[chosen_den[1]][chosen_den[0]].setMaulwurfStatus(True)  # it does now
+        else: # else when it has Maulwurf
+            tries_left = mapWidth # I chose mapWidth (which scales good enough) as the cap for looking for values
+            infest_tile(chosen_den, tries_left) # I thought recursion was a more appropriate looping mechanism
+    else:
+        rand_cave_in() #when all the dens are blocked a cave in happens randomly instead
+
+def infest_tile(tilePos: tuple[int, int], tries_left: int):
+        available_directions = [] # below checks to see if a given direction is valid, appending it if it is
+        if tilePos[1] - 1 >= 0 and not map[tilePos[1] - 1][tilePos[0]].cavedIn:
+            available_directions.append("north")
+        if tilePos[1] + 1 < mapHeight and not map[tilePos[1] + 1][tilePos[0]].cavedIn:
+            available_directions.append("south")
+        if tilePos[0] + 1 < mapWidth and not map[tilePos[1]][tilePos[0] + 1].cavedIn:
+            available_directions.append("east")
+        if tilePos[0] - 1 >= 0 and not map[tilePos[1]][tilePos[0] - 1].cavedIn:
+            available_directions.append("west")
+
+        if tries_left == 0 or len(available_directions) == 0: # if cap is reached, or there's no valid direction
+            map[tilePos[1]][tilePos[0]].setCavedIn(True) # tile caves in
+            return
+
+        infest_direction = random.choice(available_directions) # randomly selects direction out of valid ones
+        if infest_direction == "north":
+            if map[tilePos[1] - 1][tilePos[0]].hasMaulwurf: # if the tile already has Maulwurf
+                infest_tile((tilePos[0], tilePos[1] - 1), tries_left - 1) # we now infest that tile
+            else: # if it doesn't have Maulwurf
+                map[tilePos[1] - 1][tilePos[0]].setMaulwurfStatus(True) # now it does
+        elif infest_direction == "south":
+            if map[tilePos[1] + 1][tilePos[0]].hasMaulwurf: # if the tile already has Maulwurf
+                infest_tile((tilePos[0], tilePos[1] + 1), tries_left - 1) # we now infest that tile
+            else: # if it doesn't have Maulwurf
+                map[tilePos[1] + 1][tilePos[0]].setMaulwurfStatus(True) # now it does
+        elif infest_direction == "east":
+            if map[tilePos[1]][tilePos[0] + 1].hasMaulwurf: # if the tile already has Maulwurf
+                infest_tile((tilePos[0] + 1, tilePos[1]), tries_left - 1) # we now infest that tile
+            else: # if it doesn't have Maulwurf
+                map[tilePos[1]][tilePos[0] + 1].setMaulwurfStatus(True) # now it does
+        else: # for when the direction is "west"
+            if map[tilePos[1]][tilePos[0] - 1].hasMaulwurf: # if the tile already has Maulwurf
+                infest_tile((tilePos[0] - 1, tilePos[1]), tries_left - 1) # we now infest that tile
+            else: # if it doesn't have Maulwurf
+                map[tilePos[1]][tilePos[0] - 1].setMaulwurfStatus(True) # now it does
 
 
 def generateMap() -> list[list[Tile.Tile]]:
@@ -21,11 +222,12 @@ def generateMap() -> list[list[Tile.Tile]]:
     for h in range(Constants.mapHeight):
         map.append([])
         for w in range(Constants.mapWidth):
-            map[h].append(Tile.Tile((w, h), random.choices(list(Minerals.mineralTypes), weights=Minerals.weights)[0], False))
-            map[h][w].setItem(random.choices(list(Constants.Items), weights=[290, 5, 5])[0])
+            map[h].append(Tile.Tile((w, h), Tile.mineralRandomizer(1)[0],False, Tile.mineralRandomizer(2)))
+            map[h][w].setItem(random.choices(list(Constants.Items), weights = Constants.item_weights())[0])
     map[Constants.mapHeight-1][random.randint(0, Constants.mapWidth-1)].isExit = True
     playerX = random.randint(0, Constants.mapWidth-1)
     player.setPos((playerX, 0))
+    map[0][playerX].isDiscovered = True
     return map
 
 
@@ -35,51 +237,146 @@ def showMap(map: list[list[Tile.Tile]]) -> None:
         line = ""
         for item in row:
             if item.pos == player.pos:
-                line += "P "
+                line += "\033[34mP\033[0m " # makes P (the player) cyan
             else:
                 line += str(item) + " "
         if workingRow  < len(Constants.mapExtras):
             line += Constants.mapExtras[workingRow]
         print(line)
         workingRow += 1
-            
+
+def show_mini_map(map: list[list[Tile.Tile]], pos: tuple[int, int]) -> None: # skeleton based off of showMap function
+    print("-----mini map-----")
+    if pos[1] in (range(3)): # defines which rows will be shown on the mini map based off player.pos
+        row_bounds = (0, 5) # first case is for when the player is near the top of the map
+    elif pos[1] in (range((mapHeight - 3), mapHeight)): # then when the player is near the bottom
+        row_bounds = ((mapHeight - 5), mapHeight)
+    else: # lastly, all in between positions are defined directly from player.pos
+        row_bounds = ((pos[1] - 2), (pos[1] + 3))
+    if pos[0] in (range(3)): # defines which item will be shown on the mini map based off player.pos (similar way to row)
+        item_bounds = (0, 5)
+    elif pos[0] in (range((mapWidth - 3), mapWidth)):
+        item_bounds = ((mapWidth - 5), mapWidth)
+    else:
+        item_bounds = ((pos[0] - 2), (pos[0] + 3))
+    for row in map[row_bounds[0]:row_bounds[1]]:
+        line = "    "
+        for item in row[item_bounds[0]:item_bounds[1]]: # mimics what I did for row
+            if item.pos == player.pos:
+                line += "\033[34mP\033[0m " # makes P (the player) cyan
+            else:
+                line += str(item) + " "
+        print(line)
+    print("------------------")
+
+def helpMenu():
+    alignmentString = "{:<10s} {:<20s} {:<10s}"
+    print("Welcome to the game! Here are some inputs you can use")
+    print(alignmentString.format("Rules", "Move (n, s, e, w)", "Grab") + "\n" +
+          alignmentString.format("Objective", "Mine", "Use (dynamite, weapon)" + "\n" +
+          alignmentString.format("Map", "Inspect", "Inventory") + "\n" +
+          alignmentString.format("Help", "Quit (game, quit)", "Escape")))
+
+
+def move(args: list[str], map: list[list[Tile.Tile]]):
+    global player
+    arg = args[0]
+    if len(args) > 1:
+        print("all arguments past the first one have been discarded")
+    newPos: tuple[int, int] = (0, 0)
+    match arg:
+        case "n" | "north":
+            newPos = (player.pos[0] + 0, player.pos[1] - 1)
+            arg = "North"
+        case "s" | "south":
+            newPos = (player.pos[0] + 0, player.pos[1] + 1)
+            arg = "South"
+        case "e" | "east":
+            newPos = (player.pos[0] + 1, player.pos[1] + 0)
+            arg = "East"
+        case "w" | "west":
+            newPos = (player.pos[0] - 1, player.pos[1] + 0)
+            arg = "West"
+        case _:
+            print(f"move: unknown argument \"{arg}\". Valid arguments include n, s, e, w, north, south, east, or west")
+            return
+
+    YCordValid: bool = newPos[1] >= 0 and newPos[1] < Constants.mapHeight
+    XCordValid: bool = newPos[0] >= 0 and newPos[0] < Constants.mapWidth
+    if YCordValid and XCordValid:
+        map[newPos[1]][newPos[0]].isDiscovered = True #makes it so the tile is discovered if the coords are valid
+        # happens regardless if the tile is cavedIn or hasMaulwurf, makes so they will show up on map
+        if map[newPos[1]][newPos[0]].cavedIn:
+            #tells the player if the tile has caved in, makes it show on map, hints at dynamite
+            print("It seems the cave has caved in that way... dynamite would be useful here")
+        elif map[newPos[1]][newPos[0]].hasMaulwurf:
+            #tells the player if the tile has Maulwurf, makes it show on map, hints at weapon
+            print("Terrible growling rings through the cavern that way, alongside a waft of blood... only a weapon would allow continuation")
+        else:
+            player.pos = newPos #sets the player's position to the new one
+            player.actions_left -= 1 #takes away an action after the player has successfully moved
+            print(f"Moved {arg}")
+            inspect_tile(newPos)
+    else:
+            print("cannot move that direction")
+
+def showInventory():
+    for i in range(len(player.items)):
+        print(f"{i+1}: {player.items[i].name}")
 
 
 def handleInput(input: str):
     global running
     command = input.split(" ")[0].lower().strip()
     arguments = input.split(" ")[1:] # args will be passed to each command when they're implemented
+    arguments = [arg.lower().strip() for arg in arguments]
+    if len(arguments) == 0:
+        arguments.append("")
     match command:
         case "rules" | "r":
-            # TODO: add rules function when implemented
-            pass
+            Constants.game_rules()
         case "objective" | "lore" | "o" | "l":
-            # TODO: add objective defining function when implemented
-            pass
+            Constants.game_objective()
+        case "maulwurf" | "read" | "continue":
+            Constants.entry_counter += Constants.maulwurf_description(Constants.entry_counter)
         case "move":
-            player.actions_left -= 1
-            # TODO: add move function when implemented, make sure to include the cardinal directions
-            pass
+            move(arguments, map)
+            show_mini_map(map, player.pos)
+        case "n" | "s" | "e" | "w" | "north" | "south" | "east" | "west":
+            move(list(command), map)
+            show_mini_map(map, player.pos)
         case "mine" | "m":
             player.actions_left -= 1
-            # TODO: add mine function when implemented
-            pass
+            mineTile(player.pos)
         case "inspect" | "i":
-            # TODO: add inspect function when implemented
-            pass
+            inspect_tile(player.pos)
         case "compass" | "map" | "check" | "c":
             showMap(map)
         case "grab" | "pick" | "g" | "p":
-            # TODO: add grab function when implemented
-            pass
+            drop_item(player.pos)
         case "dynamite" | "d":
-            player.actions_left -= 2
-            # TODO: add dynamite (remove caved in tile) function when implemented
-            pass
+            try:
+                itemIndex = player.items.index(Constants.Items.dynamite)
+                arguments.insert(0, str(itemIndex + 1))
+                useItem(arguments, player.pos)
+            except ValueError:
+                print("no dynamite in inventory")
         case "weapon" | "fight" | "f" | "battle" | "b" | "kill":
-            player.actions_left -= 2
-            # TODO: add fight function when implemented
-            pass
+            try:
+                itemIndex = player.items.index(Constants.Items.weapon)
+                arguments.insert(0, str(itemIndex + 1))
+                useItem(arguments, player.pos)
+            except ValueError:
+                print("no weapon in inventory")
+        case "use":
+            useItem(arguments, player.pos)
+        case "help":
+            # show the help menu when the help command is run
+            helpMenu()
+        case "inventory":
+            showInventory()
+        case "exit" | "escape":
+            check_pos(player.pos)
         case "quit" | "q":
             if not set(arguments).isdisjoint(["quit", "yes", "y", "q", "game"]):
                 print("Thank you for playing Zwerg. Goodbye!")
@@ -87,6 +384,9 @@ def handleInput(input: str):
                 player.actions_left = 0
             else:
                 print("Are you sure you would like to quit? Progress will not be saved...\n(Please type in Quit Game to confirm).")
+        case "z": # got sick of spamming mine
+            if Constants.devMode:
+                player.actions_left -= 12
         case _:
             print(f"mine game: {command}: not found.")
 
@@ -96,6 +396,7 @@ daysPassed = 0
 player: Player.Player = Player.Player()
 map = generateMap()
 running = True
+
 print("Zwerg: Trial Beneath the Stone ")
 print("You descend into the mine seeking riches and glory.")
 print("Your goal; reach the escape tile and survive. But survival alone earns no glory.")
@@ -103,6 +404,10 @@ print("To be remembered, you must mine precious minerals, defeat Maulwurf monste
 print("Each action drains your energy—move, mine, inspect and kill; so use your items wisely.")
 print("Start at the top. Escape at the end.")
 print("Between lies danger, treasure, and the chance to carve your name into the history books.")
+
+
+helpMenu()
+
 
 # game loop
 while running:
@@ -112,7 +417,8 @@ while running:
         command = input(">>> ")
         handleInput(command)
 
+    print("as you go to sleep for the evening, you hear the rumbles of change in the mines")
     occurrence_probability(daysPassed)
     daysPassed += 1
-    # TODO: add event generator when done
+    check_pos(player.pos) # checks if Maulwurf or CaveIn occurred on the player's tile, kicking them to a new tile if so
 
