@@ -96,7 +96,13 @@ daysPassed = 0
 player: Player.Player = Player.Player()
 map = generateMap()
 running = True
-
+print("Zwerg: Trial Beneath the Stone ")
+print("You descend into the mine seeking riches and glory.")
+print("Your goal; reach the escape tile and survive. But survival alone earns no glory.")
+print("To be remembered, you must mine precious minerals, defeat Maulwurf monsters, and navigate collapsing tunnels.")
+print("Each action drains your energy—move, mine, inspect and kill; so use your items wisely.")
+print("Start at the top. Escape at the end.")
+print("Between lies danger, treasure, and the chance to carve your name into the history books.")
 
 # game loop
 while running:
