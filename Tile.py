@@ -4,7 +4,7 @@ import Constants, random
 
 
 def mineralRandomizer(wanted_list_size: int) -> list[Minerals.mineralTypes]:  # created a separate function so not to make the other line too long
-    mineral = random.choices(list(Minerals.mineralTypes), weights=Minerals.weights[wanted_list_size], k=2)[0:wanted_list_size]
+    mineral = random.choices(list(Minerals.mineralTypes), weights=Minerals.weights[wanted_list_size - 1], k=2)[0:wanted_list_size]
     return mineral #added k=2 above since needed 2 minerals for the fake ones
 
 
