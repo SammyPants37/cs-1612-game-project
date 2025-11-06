@@ -4,6 +4,17 @@ import Constants, Tile, Player
 
 # rest of code goes here
 
+def reload_or_start_new():
+    answer = input("\nWhat game would you like to load? (New Game or Load Game)\n>>>").strip().lower()
+    if answer in ("new game", "new"):
+        print("Input accepted\n")
+    elif answer in ("load game", "load", "save", "saved file", "reload", "reload file"):
+        print("Reloading file not currently supported, new game initialized\n")
+        # TODO: add saved file loading
+    else:
+        print('(Please input either "New" or "Load")')
+        reload_or_start_new()
+
 def drop_item(tilePos: tuple[int, int]):
     # grab_item takes the player's tile's item, spits out whatever will have to be dropped
     dropped_item: Constants.Items = player.grab_item(map[tilePos[1]][tilePos[0]].item)
@@ -395,15 +406,8 @@ player: Player.Player = Player.Player()
 map = generateMap()
 running = True
 
-print("Zwerg: Trial Beneath the Stone ")
-print("You descend into the mine seeking riches and glory.")
-print("Your goal; reach the escape tile and survive. But survival alone earns no glory.")
-print("To be remembered, you must mine precious minerals, defeat Maulwurf monsters, and navigate collapsing tunnels.")
-print("Each action drains your energy—move, mine, inspect and kill; so use your items wisely.")
-print("Start at the top. Escape at the end.")
-print("Between lies danger, treasure, and the chance to carve your name into the history books.")
-
-
+Constants.start_game_text()
+reload_or_start_new()
 helpMenu()
 
 
