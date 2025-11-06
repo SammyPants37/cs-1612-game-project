@@ -375,8 +375,6 @@ def handleInput(input: str):
             helpMenu()
         case "inventory":
             showInventory()
-        case "exit" | "escape":
-            check_pos(player.pos)
         case "quit" | "q":
             if not set(arguments).isdisjoint(["quit", "yes", "y", "q", "game"]):
                 print("Thank you for playing Zwerg. Goodbye!")
