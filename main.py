@@ -413,6 +413,7 @@ while running:
     # run player moves
     while player.actions_left > 0:
         check_pos(player.pos) # checks if Maulwurf or CaveIn occurred on the player's tile, kicking them to a new tile if so
+        if player.actions_left == 0: break
         command = input(">>> ")
         handleInput(command)
     if running:
