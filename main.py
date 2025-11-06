@@ -85,7 +85,7 @@ def mineTile(tilePos: tuple[int, int]):
     player.add_score(tileMineral)
     map[tilePos[1]][tilePos[0]].drainMineral()
     print(tileMineral.miningDescription)
-    print(f"{tileMineral.description} mined")
+    print(f"{tileMineral.description} mined (+{tileMineral.score_value}!) --> Current Score: {player.total_score}")
 
 
 def inspect_tile(tilePos: tuple[int, int]):
@@ -335,7 +335,7 @@ def handleInput(input: str):
     match command:
         case "rules" | "r":
             Constants.game_rules()
-        case "objective" | "lore" | "o" | "l":
+        case "objective" | "lore" | "o":
             Constants.game_objective()
         case "maulwurf" | "read" | "continue":
             Constants.entry_counter += Constants.maulwurf_description(Constants.entry_counter)
@@ -348,7 +348,7 @@ def handleInput(input: str):
         case "mine" | "m":
             player.actions_left -= 1
             mineTile(player.pos)
-        case "inspect" | "i":
+        case "inspect" | "l" | "look":
             inspect_tile(player.pos)
         case "compass" | "map" | "check" | "c":
             showMap(map)
@@ -373,7 +373,7 @@ def handleInput(input: str):
         case "help":
             # show the help menu when the help command is run
             helpMenu()
-        case "inventory":
+        case "inventory" | "i":
             showInventory()
         case "quit" | "q":
             if not set(arguments).isdisjoint(["quit", "yes", "y", "q", "game"]):
@@ -412,11 +412,11 @@ while running:
     player.actions_left += Constants.NumPlayerMoves #refunds 3 actions
     # run player moves
     while player.actions_left > 0:
+        check_pos(player.pos) # checks if Maulwurf or CaveIn occurred on the player's tile, kicking them to a new tile if so
         command = input(">>> ")
         handleInput(command)
     if running:
         print("as you go to sleep for the evening, you hear the rumbles of change in the mines")
         occurrence_probability(daysPassed)
         daysPassed += 1
-        check_pos(player.pos) # checks if Maulwurf or CaveIn occurred on the player's tile, kicking them to a new tile if so
 
