@@ -375,8 +375,6 @@ def handleInput(input: str):
             helpMenu()
         case "inventory" | "i":
             showInventory()
-        case "exit" | "escape":
-            check_pos(player.pos)
         case "quit" | "q":
             if not set(arguments).isdisjoint(["quit", "yes", "y", "q", "game"]):
                 print("Thank you for playing Zwerg. Goodbye!")
@@ -417,8 +415,8 @@ while running:
         check_pos(player.pos) # checks if Maulwurf or CaveIn occurred on the player's tile, kicking them to a new tile if so
         command = input(">>> ")
         handleInput(command)
-
-    print("as you go to sleep for the evening, you hear the rumbles of change in the mines")
-    occurrence_probability(daysPassed)
-    daysPassed += 1
+    if running:
+        print("as you go to sleep for the evening, you hear the rumbles of change in the mines")
+        occurrence_probability(daysPassed)
+        daysPassed += 1
 
