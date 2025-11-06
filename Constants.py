@@ -5,9 +5,11 @@ from enum import Enum
 def event_number_scaler(x: int) -> int: #current formula for scaling how many events will have a 1/6th chance of occurring
     return int((1 / 50) * x ** 2 + 1)
 
+event_weights = (5,4) # weights for choosing which event occurs. (infest, cave in)
+
 class Minerals:
-    weights = [(1, 4, 5, 6, 8, 17, 18, 30, 40, 50, 110, 200, 9), # weights ordered from least to most common (real)
-               (0, 12, 11, 10, 9, 17, 16, 35, 40, 50, 110, 200, 0)] # fake weights generation hehe
+    weights = [(1, 4, 5, 6, 8, 17, 18, 30, 40, 50, 110, 175, 9, 0), # real weights, ordered the same as mineralTypes(Enum)
+               (0, 2, 3, 5, 7, 12, 15, 35, 40, 48, 110, 225, 0, 0)] # fake weights for map generation
 
     # Enum classes allow the value and name of a function to be used in place of a function
     class mineralTypes(Enum):
@@ -23,7 +25,8 @@ class Minerals:
         iron = (9, "Iron", 1750, "As a dwarf you can never complain when there’s iron involved, or at least that’s what all the village smiths said.\nYou mine a large vein of iron that’d make your ancestors proud.")
         copper = (10, "Copper", 750, "Not as good as iron, but not the worst in the world for forging. You fill your bag with wads of copper.")
         coal = (11, "Coal", 250, "Your eyes glimmer at the sight of a room laden with di–coal. Just coal. With tears in your eyes from the wasted time,\nyou begrudgingly stuff your bag with clumps of coal.")
-        monsterDen = (12, "Maulwurf Egg", 6000, "you hack away at the maulwurf den and are surprised to find that you receive a maulwurf egg for your troubles.")
+        monsterDen = (12, "Maulwurf Egg", 17500, "you hack away at the maulwurf den and are surprised to find that you receive a maulwurf egg for your troubles.")
+        maulwurf = (13, "Maulwurf Remains", 8250, "After gouging through the eyes of a cavern full of Maulwurf you lay your battered weapon to rest")
 
         # expanding on an Enum with a __init__ allows more than value and name to be associated with a variable
         def __init__(self, code: int, description: str, score_value: int, miningDescription: str):
@@ -38,7 +41,7 @@ class Minerals:
             print(Minerals.mineralTypes.diamond.score_value) # 100000 """
 
 devMode = False # added devMode to check if things are working as expected easier
-ItemLimit = 3
+ItemLimit = 4
 NumPlayerMoves = 3
 DenominatorEventsOccur = 6 # in case we would like to change the 1/6th chance they occur separately
 

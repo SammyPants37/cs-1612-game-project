@@ -82,14 +82,18 @@ def useItem(args: list[str], playerPos: tuple[int, int]):
             print("Please input a valid direction. Valid directions include north, south, east, and west.")
 
     if itemUsable:
-        print(f"Used {item.name}")
+        if item.name == "weapon": maulwurf_remains(Minerals.mineralTypes.maulwurf)
+        print(f"Used {item.name}", end=", ")
         player.items[itemIndex] = Constants.Items.nothing
         player.actions_left -= 1
         move([direction], map)
     else:
-        print("Item is not useable in that direction.")
+        print("Item is not usable in that direction.")
             
-
+def maulwurf_remains(monster: Minerals.mineralTypes):
+    player.add_score(monster)
+    print(monster.miningDescription)
+    print(f"Gathered {monster.description} (+{monster.score_value}!) --> Current Score: {player.total_score}")
 
 def mineTile(tilePos: tuple[int, int]):
     tileMineral: Minerals.mineralTypes = map[tilePos[1]][tilePos[0]].resourceType
@@ -155,8 +159,8 @@ def occurrence_probability(numDays: int):
     while possibleEvents > 0: #while potential events haven't occurred
         event_occurred = random.randint(1,Constants.DenominatorEventsOccur) # DEO = 6
         if event_occurred == 1: # 1/6 chance of occurring
-            rand_event = random.randint(1, 2)
-            if rand_event == 1:
+            rand_event = random.choices(("infest", "cave in"), weights = Constants.event_weights)[0]
+            if rand_event == "infest":
                 rand_den_infest()
             else:
                 rand_cave_in()
