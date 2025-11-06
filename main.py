@@ -85,7 +85,7 @@ def mineTile(tilePos: tuple[int, int]):
     player.add_score(tileMineral)
     map[tilePos[1]][tilePos[0]].drainMineral()
     print(tileMineral.miningDescription)
-    print(f"{tileMineral.description} mined")
+    print(f"{tileMineral.description} mined (+{tileMineral.score_value}!) --> Current Score: {player.total_score}")
 
 
 def inspect_tile(tilePos: tuple[int, int]):
