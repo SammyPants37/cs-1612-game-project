@@ -6,8 +6,8 @@ def event_number_scaler(x: int) -> int: #current formula for scaling how many ev
     return int((1 / 50) * x ** 2 + 1)
 
 class Minerals:
-    weights = [(1, 4, 5, 6, 8, 17, 18, 30, 40, 50, 110, 200, 9), # weights ordered from least to most common (real)
-               (0, 12, 11, 10, 9, 17, 16, 35, 40, 50, 110, 200, 0)] # fake weights generation hehe
+    weights = [(1, 4, 5, 6, 8, 17, 18, 30, 40, 50, 110, 150, 9), # weights ordered from least to most common (real)
+               (0, 12, 11, 10, 9, 17, 16, 35, 40, 50, 110, 150, 0)] # fake weights generation hehe
 
     # Enum classes allow the value and name of a function to be used in place of a function
     class mineralTypes(Enum):
