@@ -17,13 +17,13 @@ def useItem(args: list[str], playerPos: tuple[int, int]):
     if len(args) > 1:
         direction = args[1]
     else:
-        print("missing arguement for direction to use the item.")
+        print("missing argument for direction to use the item.")
         return
 
     if itemIndex.isdigit():
         itemIndex = int(itemIndex) - 1
     else:
-        print("please input a number as the first arguement to specify the item to use")
+        print("please input a number as the first argument to specify the item to use")
         return
 
     if itemIndex < 0 or itemIndex > ItemLimit - 1:
@@ -108,7 +108,7 @@ def check_pos(pos: tuple[int, int]): # didn't want player.pos in Tile.py
     global running
     if map[pos[1]][pos[0]].isExit: # if the player is on the exit
         answer = input("Do you want to escape the mountains? (Yes or No): ").strip().lower()
-        if answer in ("yes", "y", "escape", "exit", "e"):
+        if answer in ("yes", "y", "escape", "exit"):
             player.exit_message()
             running = False
             player.actions_left = 0
@@ -237,7 +237,7 @@ def showMap(map: list[list[Tile.Tile]]) -> None:
         line = ""
         for item in row:
             if item.pos == player.pos:
-                line += "\033[34mP\033[0m " # makes P (the player) cyan
+                line += "\033[34mP\033[0m " # makes P (the player) blue
             else:
                 line += str(item) + " "
         if workingRow  < len(Constants.mapExtras):
