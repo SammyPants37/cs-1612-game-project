@@ -335,7 +335,7 @@ def handleInput(input: str):
     match command:
         case "rules" | "r":
             Constants.game_rules()
-        case "objective" | "lore" | "o" | "l":
+        case "objective" | "lore" | "o":
             Constants.game_objective()
         case "maulwurf" | "read" | "continue":
             Constants.entry_counter += Constants.maulwurf_description(Constants.entry_counter)
@@ -348,7 +348,7 @@ def handleInput(input: str):
         case "mine" | "m":
             player.actions_left -= 1
             mineTile(player.pos)
-        case "inspect" | "i":
+        case "inspect" | "l" | "look":
             inspect_tile(player.pos)
         case "compass" | "map" | "check" | "c":
             showMap(map)
@@ -373,7 +373,7 @@ def handleInput(input: str):
         case "help":
             # show the help menu when the help command is run
             helpMenu()
-        case "inventory":
+        case "inventory" | "i":
             showInventory()
         case "exit" | "escape":
             check_pos(player.pos)
