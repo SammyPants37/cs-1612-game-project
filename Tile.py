@@ -44,7 +44,7 @@ class Tile():
     @override
     def __str__(self) -> str:
         if self.isExit:
-            return "\033[36mE\033[0m" # returns E in blue
+            return "\033[36mE\033[0m" # returns E in cyan
         else:
             if self.isDiscovered:
                 if self.cavedIn:
