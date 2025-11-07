@@ -19,7 +19,10 @@ class Tile():
         self.isExit: bool = isExit
         self.hasMaulwurf: bool = False
         self.item: Constants.Items = Constants.Items.nothing
-    
+
+    def make_discovered(self):
+        self.isDiscovered = True
+
     def setItem(self, item: Constants.Items):
         self.item = item
     
