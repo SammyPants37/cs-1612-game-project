@@ -21,8 +21,16 @@ class Player:
     def exit_message(self):
         print("Congratulations -- you successfully escaped the mountains with your life!")
         print(f"Score: {self.total_score}")
-        # TODO: add specialized messages based on score
-        # TODO: save and show game stats and prompt to "play again?"
+        if self.total_score >= 250000:
+            print( "The mine yields to your mastery. Dwarves sing your name, carving it into stone so it may never be forgotten!")
+        elif self.total_score >= 100000:
+            print("You have returned with riches and tales, enough to retire you in comfort.")
+        elif self.total_score >= 50000:
+            print("You have crawled from the depths, bruised and breathless. The mine have claimed your strength and offered little in return.")
+        else:
+            print("You have crawled out with bones intact, but the mine still stands, unbroken and mocking your retreat.")
+
+    # TODO: save and show game stats and prompt to "play again?"
 
     def setPos(self, pos: tuple[int, int]):
         self.pos = pos
