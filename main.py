@@ -25,12 +25,6 @@ def useItem(args: list[str], playerPos: tuple[int, int]):
     global player
     itemIndex = args[0]
 
-    if len(args) > 1:
-        direction = args[1]
-    else:
-        print("missing argument for direction to use the item.")
-        return
-
     if itemIndex.isdigit():
         itemIndex = int(itemIndex) - 1
     else:
@@ -42,6 +36,19 @@ def useItem(args: list[str], playerPos: tuple[int, int]):
         return
 
     item = player.items[itemIndex]
+
+    if item == Constants.Items.mushroom:
+        use_mushroom(map, player.pos)
+        player.items[itemIndex] = Constants.Items.nothing
+        player.actions_left -= 2
+        return
+
+    if len(args) > 1:
+        direction = args[1]
+    else:
+        print("missing argument for direction to use the item.")
+        return
+
 
     itemUsable: bool = False
 
@@ -90,6 +97,31 @@ def useItem(args: list[str], playerPos: tuple[int, int]):
         print("Item is not useable in that direction.")
             
 
+def use_mushroom(map: list[list[Tile.Tile]], pos: tuple[int, int]) -> None: # skeleton based off of mini map
+    print(f"As the psilocybe slips down your gullet, you feel a heightened connection to the caverns around you\nUsed mushroom")
+    print("-----mini map-----")
+    if pos[1] in (range(3)):  # defines which rows will be shown on the mini map based off player.pos
+        row_bounds = (0, 5)  # first case is for when the player is near the top of the map
+    elif pos[1] in (range((mapHeight - 3), mapHeight)):  # then when the player is near the bottom
+        row_bounds = ((mapHeight - 5), mapHeight)
+    else:  # lastly, all in between positions are defined directly from player.pos
+        row_bounds = ((pos[1] - 2), (pos[1] + 3))
+    if pos[0] in (range(3)):  # defines which item will be shown on the mini map based off player.pos (similar way to row)
+        item_bounds = (0, 5)
+    elif pos[0] in (range((mapWidth - 3), mapWidth)):
+        item_bounds = ((mapWidth - 5), mapWidth)
+    else:
+        item_bounds = ((pos[0] - 2), (pos[0] + 3))
+    for row in map[row_bounds[0]:row_bounds[1]]:
+        line = "    "
+        for item in row[item_bounds[0]:item_bounds[1]]:  # mimics what I did for row
+            item.make_discovered()
+            if item.pos == player.pos:
+                line += "\033[34mP\033[0m "  # makes P (the player) cyan
+            else:
+                line += str(item) + " "
+        print(line)
+    print("------------------")
 
 def mineTile(tilePos: tuple[int, int]):
     tileMineral: Minerals.mineralTypes = map[tilePos[1]][tilePos[0]].resourceType
@@ -363,7 +395,7 @@ def handleInput(input: str):
             inspect_tile(player.pos)
         case "compass" | "map" | "check" | "c":
             showMap(map)
-        case "grab" | "pick" | "g" | "p":
+        case "grab" | "pick" | "g":
             drop_item(player.pos)
         case "dynamite" | "d":
             try:
@@ -379,6 +411,13 @@ def handleInput(input: str):
                 useItem(arguments, player.pos)
             except ValueError:
                 print("no weapon in inventory")
+        case "mushroom" | "shroom" | "psilocybe" | "conecsiemuer" | "p":
+            try:
+                itemIndex = player.items.index(Constants.Items.mushroom)
+                arguments.insert(0, str(itemIndex + 1))
+                useItem(arguments, player.pos)
+            except ValueError:
+                print("no mushroom in inventory")
         case "use":
             useItem(arguments, player.pos)
         case "help":
