@@ -52,7 +52,7 @@ class Items(Enum):
     mushroom = 3
 
 def item_weights(): # to make items more or less common
-    return [40,5,5,2] # nothing, dynamite, weapon, mushroom
+    return [38,5,5,2] # nothing, dynamite, weapon, mushroom
 
 mapExtras = [
     "    Legend:",
