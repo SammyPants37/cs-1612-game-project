@@ -7,6 +7,41 @@ def event_number_scaler(x: int) -> int: #current formula for scaling how many ev
 
 event_weights = (5,4) # weights for choosing which event occurs. (infest, cave in)
 
+class AnsiColors:
+    def red(self, text):
+        return f"\033[31m{text}\033[0m"
+    def green(self, text):
+        return f"\033[32m{text}\033[0m"
+    def yellow(self, text):
+        return f"\033[33m{text}\033[0m"
+    def blue(self, text):
+        return f"\033[34m{text}\033[0m"
+    def purple(self, text):
+        return f"\033[35m{text}\033[0m"
+    def cyan(self, text):
+        return f"\033[36m{text}\033[0m"
+    def gray(self, text):
+        return f"\033[37m{text}\033[0m"
+    def graybgrd(self, text):
+        return f"\033[100m{text}"
+    def italics(self, text):
+        return f"\033[3m{text}\033[0m"
+    def g_bold(self, text):
+        return f"\033[1:32m{text}\033[0m"
+    def b_bold(self, text):
+        return f"\033[1:34m{text}\033[0m"
+    def b_italics(self, text):
+        return f"\033[3:34m{text}\033[0m"
+    def bold_to_ital(self, text):
+        return f"\033[1m{text}\033[22m"
+    def reset(self):
+        return "\033[0m"
+    def purp_ydash(self, text): # creates a bold yellow dash through the preceding character (purple)
+        return f"\033[35m{text}\033[1:33m\u0336\033[0m"
+
+ansi: AnsiColors = AnsiColors()
+
+
 class Minerals:
     weights = [(1, 4, 5, 6, 8, 17, 18, 30, 40, 50, 110, 175, 9, 0), # real weights, ordered the same as mineralTypes(Enum)
                (0, 2, 3, 5, 7, 12, 15, 35, 40, 48, 110, 225, 0, 0)] # fake weights for map generation
@@ -25,7 +60,7 @@ class Minerals:
         iron = (9, "Iron", 1750, "As a dwarf you can never complain when there’s iron involved, or at least that’s what all the village smiths said.\nYou mine a large vein of iron that’d make your ancestors proud.")
         copper = (10, "Copper", 750, "Not as good as iron, but not the worst in the world for forging. You fill your bag with wads of copper.")
         coal = (11, "Coal", 250, "Your eyes glimmer at the sight of a room laden with di–coal. Just coal. With tears in your eyes from the wasted time,\nyou begrudgingly stuff your bag with clumps of coal.")
-        monsterDen = (12, "Maulwurf Egg", 17500, "you hack away at the maulwurf den and are surprised to find that you receive a maulwurf egg for your troubles.")
+        monsterDen = (12, "Maulwurf Egg", 17500, "You hack away at the Maulwurf den and are surprised to find that you receive a Maulwurf egg for your troubles.")
         maulwurf = (13, "Maulwurf Remains", 8250, "After gouging through the eyes of a cavern full of Maulwurf you lay your battered weapon to rest")
 
         # expanding on an Enum with a __init__ allows more than value and name to be associated with a variable
@@ -57,47 +92,47 @@ def item_weights(): # to make items more or less common
 mapExtras = [
     "    Legend:",
     f"    ?: unexplored tile {"N":^15}",
-    f"    \033[37m_\033[0m: unmineable tile {"ᐃ":^15}",
-    f"    \033[31m#\033[0m: caved in tile   {"W ᐊ ✪ ᐅ E":^15}",
-    f"    \033[34mP\033[0m: player          {"ᐁ":^15}",
-    f"    \033[32mO\033[0m: mineral tile    {"S":^15}",
-    f"    \033[36mE\033[0m: exit/escape tile",
-    f"    \033[33mM\033[0m: monster infested tile",
-    f"    \033[35mD\033[0m: monster den tile",
-    f"    \033[100m \033[0m: tile has item"]
+    f"    {ansi.gray("_")}: unmineable tile {"ᐃ":^15}",
+    f"    {ansi.red("#")}: caved in tile   {"W ᐊ ✪ ᐅ E":^15}",
+    f"    {ansi.blue("P")}: player          {"ᐁ":^15}",
+    f"    {ansi.green("O")}: mineral tile    {"S":^15}",
+    f"    {ansi.cyan("E")}: exit/escape tile",
+    f"    {ansi.yellow("M")}: monster infested tile",
+    f"    {ansi.purple("D")}: monster den tile",
+    f"    {ansi.graybgrd(" ") + ansi.reset()}: tile has item"]
 # refer to Tile.py, in @override to see comments for each symbol's color, main.py showMap for P
 
 mapWidth = 25 # must be greater than 5
 mapHeight = 25 # must be greater than 5
 
 def game_objective():
-    print("\033[34mYou are an aspiring dwarf\033[0m native to the Great Northern Mountains, being born\n"
-    'and raised in “Zwergberg”, the dwarven village \033[34mlocated in the most Northern part\033[0m\n'
+    print(f"{ansi.blue("You are an aspiring dwarf")} native to the Great Northern Mountains, being born\n"
+    f'and raised in “Zwergberg”, the dwarven village {ansi.blue("located in the most Northern part")}\n'
     "of the mine. Recently coming of age, you are ready to put your pickaxe to use\n"
-    "and \033[32mstrike it rich!\033[0m But strange rumors have been beginning to surface that the\n"
+    f"and {ansi.green("strike it rich!")} But strange rumors have been beginning to surface that the\n"
     "mountain’s caverns and crevices, which have been safely mined safely for\n"
-    "innumerable generations, are destined to \033[31mCOLLAPSE!\033[0m Strange tremors have been\n"
-    "occurring more frequently, causing parts of the mine to \033[31mcave in\033[0m, and the \033[33mmine’s\n"
-    "creatures\033[0m, the flesh and stone eating \033[33mMaulwurf\033[0m, have been increasingly active. You\n"
-    "have decided to \033[36mhead South to escape\033[0m the mine to the sky plane before it is too\n"
-    "late! Of course stuffing your pockets full of \033[32mvaluable minerals\033[0m on the way out.\n")
+    f"innumerable generations, are destined to {ansi.red("COLLAPSE!")} Strange tremors have been\n"
+    f"occurring more frequently, causing parts of the mine to {ansi.red("cave in")}, and the {ansi.yellow("mine's")}\n"
+    f"{ansi.yellow("creatures")}, the flesh and stone eating {ansi.yellow("Maulwurf")}, have been increasingly active. You\n"
+    f"have decided to {ansi.cyan("head South to escape")} the mine to the sky plane before it is too\n"
+    f"late! Of course stuffing your pockets full of {ansi.green("valuable minerals")} on the way out.\n")
 
 def game_rules():
-    print(f"\033[34mEvery turn the player gets {NumPlayerMoves} major actions\033[0m, but use them wisely! After each turn there\n"
-          "is a chance for a \033[31mdisastrous event\033[0m to occur: either a tile will \033[31mcave in\033[0m or the \033[33mMaulwurf\033[0m\n"
-          "will migrate from their \033[35mdens\033[0m. These will only become more and more likely, and numerous,\n"
-          "as the days pass by. It is imperative to \033[36mescape\033[0m before you are inevitably \033[31mtrapped\033[0m and have\n"
-          "to wait to \033[31mdie\033[0m.... However, \033[34mitems\033[0m can be used to clear \033[31mcave ins\033[0m and eliminate \033[33mMaulwurf\033[0m\n"
-          "from tiles, which can help you from getting \033[31mtrapped\033[0m. Make sure to \033[34mgrab them when you can!\033[0m\n"
-          f"But be strategic with what you carry though; \033[34myou can only hold {ItemLimit} items in your inventory\033[0m\n"
-          "at any given time. Before you \033[36mleave the mines\033[0m it is important to \033[34mamass a healthy fortune\033[0m\n"
-          "and \033[34mimprove your game score\033[0m. \033[32mCoal\033[0m and \033[32mcopper\033[0m (besides those pesky \033[37mworthless rocks\033[0m) are some\n"
-          "of the least valuable minerals to mine, and hence give the \033[32mlowest score\033[0m. They are also the\n"
-          "\033[32mmost common minerals\033[0m to find. Collecting \033[32mrare minerals\033[0m, like \033[32mdiamonds\033[0m, give a much \033[32mhigher\n"
-          "score\033[0m. \033[34mInspecting a tile is a useful way to gleam what could be on the tile\033[0m, and whether it\n"
-          "is worth the \033[35mtime\033[0m and \033[35mactions\033[0m it takes to mine. However, \033[33mdon't think\033[0m seeing a \033[32mdiamond\033[0m listed\n"
-          "as one of three possibilities means there is a \033[33m1/3rd chance\033[0m to get it... its probably \033[32mcoal\033[0m.\n"
-          "Once (\033[31mif\033[0m) you make it to the \033[36mexit\033[0m, input \033[36mEscape to exit the mountains\033[0m with your \033[32mfortune\033[0m!")
+    print(f"{ansi.blue(f"Every turn the player gets {NumPlayerMoves} major actions")}, but use them wisely! After each turn there\n"
+          f"is a chance for a {ansi.red("disastrous event")} to occur: either a tile will {ansi.red("cave in")} or the {ansi.yellow("Maulwurf")}\n"
+          f"will migrate from their {ansi.purple("dens")}. These will only become {ansi.yellow("more and more likely, and numerous,")}\n"
+          f"{ansi.yellow("as the days pass by")}. It is imperative to {ansi.cyan("escape")} before you are inevitably {ansi.red("trapped")} and have\n"
+          f"to wait to {ansi.red("die")}.... However, {ansi.blue("items")} can be used to clear {ansi.red("cave ins")} and eliminate {ansi.yellow("Maulwurf")}\n"
+          f"from tiles, as well as {ansi.blue("reveal surrounding tiles")}. So make sure to {ansi.blue("grab them when you can!")}\n"
+          f"But be strategic with what you carry though; {ansi.blue(f"you can only hold {ItemLimit} items in your inventory")}\n"
+          f"at any given time. Before you {ansi.cyan("leave the mines")} it is important to {ansi.green("amass a healthy fortune")}\n"
+          f"and {ansi.blue("improve your game score")}. {ansi.green("Coal")} and {ansi.green("copper")} (besides those pesky {ansi.gray("worthless rocks")}) are some\n"
+          f"of the least valuable minerals to mine, and hence give the {ansi.green("lowest score")}. They are also the\n"
+          f"{ansi.green("most common minerals")} to find. Collecting {ansi.green("rare minerals")}, like {ansi.green("diamonds")}, give a much {ansi.green("higher")}\n"
+          f"{ansi.green("score")}. {ansi.blue("Inspecting a tile is a useful way to gleam what could be on the tile")}, and whether it\n"
+          f'is worth the {ansi.purple("time")} and {ansi.purple("actions")} it takes to mine. But {ansi.yellow("be warned")}, these {ansi.blue('3 "possibilities"')} given\n'
+          f"{ansi.yellow("aren't always fair")}... {ansi.blue("only one")} of those {ansi.green("minerals")} listed {ansi.blue("are real")} after all, and it's probably {ansi.green("coal")}.\n"
+          f"{ansi.blue("Once")} ({ansi.red("if")}) you make it to the {ansi.cyan("exit")}, input {ansi.cyan("Escape to exit the mountains")} with your {ansi.green("fortune")}!")
 
 entry_counter = 0
 def maulwurf_description(entry_num):
@@ -124,16 +159,19 @@ def maulwurf_description(entry_num):
                         "Their hard exteriors are riddled with a variety of rare minerals and stones, which\nmake it a highly prized trophy that any race would respect due to the hazards it takes to collect.",
                         "No one’s yet figured out how to eat it though, or make it hatch for that matter.",
                         "Would make one wonder whether it's an egg at all if the Maulwurf didn’t guard them so ferociously....")
-    print(f"--Entry #{entry_num}--\n{description_list[entry_num]}\n--Reinput to continue reading--")
+    print(ansi.italics(f"--Entry #{entry_num}--\n{description_list[entry_num]}\n--Reinput to continue reading--"))
     if entry_num == 22:
         return -22
     return 1
 
 def start_game_text():
-    print("Zwerg: Trial Beneath the Stone ")
-    print("You descend into the mine seeking riches and glory.")
-    print("Your goal; reach the escape tile and survive. But survival alone earns no glory.")
-    print("To be remembered, you must mine precious minerals, defeat Maulwurf monsters, and navigate collapsing tunnels.")
-    print("Each action drains your energy—move, mine, inspect and kill; so use your items wisely.")
-    print("Start at the top. Escape at the end.")
-    print("Between lies danger, treasure, and the chance to carve your name into the history books.")
+    print(f" --- {ansi.blue(ansi.bold_to_ital("Zwerg: Trial Beneath the Stone"))} --- \n"
+          f"You descend into the mine seeking {ansi.green("riches and glory")}.\n"
+          f"Your goal; {ansi.cyan("reach the escape tile and survive")}. But {ansi.b_italics("survival alone earns nothing")}.\n"
+          f"To be remembered, you must {ansi.green("mine precious minerals")}, "
+          f"defeat {ansi.yellow("Maulwurf")} monsters, and navigate {ansi.red("collapsing tunnels")}.\n" +
+          ansi.b_italics("Each action drains your energy—move, mine, and use items; so spend each wisely.\n") +
+          f"Start at the top. {ansi.cyan("Escape")} at the end.\n"
+          f"Between lies {ansi.red("danger")}, {ansi.green("treasure")}, and the " +
+          ansi.b_italics("chance to carve your name into the history books") + ".\n"
+          f" --- {ansi.blue(ansi.bold_to_ital("May Fortunes be for the Living"))} ---\n")

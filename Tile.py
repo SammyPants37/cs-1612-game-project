@@ -1,7 +1,7 @@
 from typing import override
 from Constants import Minerals
 import Constants, random
-
+ansi: Constants.AnsiColors = Constants.AnsiColors()
 
 def mineralRandomizer(wanted_list_size: int) -> list[Minerals.mineralTypes]:  # created a separate function so not to make the other line too long
     mineral = random.choices(list(Minerals.mineralTypes), weights=Minerals.weights[wanted_list_size - 1], k=2)[0:wanted_list_size]
@@ -47,25 +47,25 @@ class Tile():
     @override
     def __str__(self) -> str:
         if self.isExit:
-            return "\033[36mE\033[0m" # returns E in cyan
+            return ansi.cyan("E") # returns E in cyan
         else:
             if self.isDiscovered:
                 if self.cavedIn:
-                    return "\033[31m#\033[0m" # returns # in red
+                    return ansi.red("#") # returns # in red
                 elif self.hasMaulwurf:
                     if self.resourceType == Minerals.mineralTypes.monsterDen:
-                        return "\033[35mD\033[1:33m\u0336\033[0m" # returns D in purple with a bold yellow dash
-                    return "\033[33mM\033[0m" # returns M in yellow
+                        return ansi.purp_ydash("D") # returns D in purple with a bold yellow dash
+                    return ansi.yellow("M") # returns M in yellow
                 elif self.item != Constants.Items.nothing:
-                    bgrd = "\033[100m"
+                    bgrd = ansi.graybgrd("")
                 else:
                     bgrd = ""
                 match self.resourceType:
                     case Minerals.mineralTypes.unminable:
-                        return f"{bgrd}\033[37m_\033[0m" # returns _ in gray
+                        return bgrd + ansi.gray("_") # returns _ in gray
                     case Minerals.mineralTypes.monsterDen:
-                        return f"{bgrd}\033[35mD\033[0m" # returns D in purple
+                        return bgrd + ansi.purple("D") # returns D in purple
                     case _:
-                        return f"{bgrd}\033[32mO\033[0m" # returns O in green
+                        return bgrd + ansi.green("O") # returns O in green
             else:
                 return "?"

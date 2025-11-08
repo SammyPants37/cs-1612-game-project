@@ -4,11 +4,12 @@ import Constants, Tile, Player
 
 # rest of code goes here
 
-def reload_or_start_new():
-    answer = input("\nWhat game would you like to load? (New Game or Load Game)\n>>>").strip().lower()
-    if answer in ("new game", "new"):
+def reload_or_start_new(): # leaving as skeleton, might want to incorporate into quit input (or its own)
+    answer = input("What game would you like to load? (New Game or Load Game)\n>>> ").strip().lower()
+    if answer in ("n", "new game", "new"):
         print("Input accepted\n")
-    elif answer in ("load game", "load", "save", "saved file", "reload", "reload file"):
+        # TODO: begin initialization of game/allow initialization
+    elif answer in ("l", "load game", "load", "save", "saved file", "reload", "reload file"):
         print("Reloading file not currently supported, new game initialized\n")
         # TODO: add saved file loading
     else:
@@ -28,11 +29,12 @@ def useItem(args: list[str], playerPos: tuple[int, int]):
     if itemIndex.isdigit():
         itemIndex = int(itemIndex) - 1
     else:
-        print("please input a number as the first argument to specify the item to use")
+        print(ansi.b_italics("please input a number as the first argument to specify the item to use"))
         return
 
     if itemIndex < 0 or itemIndex > ItemLimit - 1:
-        print(f"argument 1 needs to be within 1 and {ItemLimit}")
+        print(ansi.b_italics("first argument needs to be within "
+                             f"{ansi.bold_to_ital("1")} and {ansi.bold_to_ital(ItemLimit)}"))
         return
 
     item = player.items[itemIndex]
@@ -46,7 +48,7 @@ def useItem(args: list[str], playerPos: tuple[int, int]):
     if len(args) > 1:
         direction = args[1]
     else:
-        print("missing argument for direction to use the item.")
+        print(ansi.b_italics(f"missing argument for {ansi.bold_to_ital("direction")} to use the item."))
         return
 
 
@@ -86,24 +88,27 @@ def useItem(args: list[str], playerPos: tuple[int, int]):
                         map[playerPos[1]][playerPos[0] - 1].setMaulwurfStatus(False)
                     itemUsable = True
         case _:
-            print("Please input a valid direction. Valid directions include north, south, east, and west.")
+            print(ansi.b_italics("Please input a valid direction. Valid directions include "
+                                 f"{ansi.bold_to_ital("north")}, {ansi.bold_to_ital("south")}, "
+                                 f"{ansi.bold_to_ital(")east")}, and {ansi.bold_to_ital("west")}."))
 
     if itemUsable:
         if item.name == "weapon": maulwurf_remains(Minerals.mineralTypes.maulwurf)
-        print(f"Used {item.name}", end=", ")
+        print(ansi.b_italics(f"Used {item.name},"), end=" ")
         player.items[itemIndex] = Constants.Items.nothing
         player.actions_left -= 1
         move([direction], map)
     else:
-        print("Item is not usable in that direction.")
+        print(ansi.b_italics("Item is not usable in that direction."))
             
 def maulwurf_remains(monster: Minerals.mineralTypes):
     player.add_score(monster)
-    print(monster.miningDescription)
-    print(f"Gathered {monster.description} (+{monster.score_value}!) --> Current Score: {player.total_score}")
+    print(ansi.italics(monster.miningDescription))
+    print(f"{ansi.b_italics("Gathered Resource")}: {ansi.g_bold(monster.description)} ({ansi.g_bold(f"+{monster.score_value}!")}) --> {ansi.cyan(f"Current Score: {player.total_score}")}")
 
 def use_mushroom(map: list[list[Tile.Tile]], pos: tuple[int, int]) -> None: # skeleton based off of mini map
-    print(f"As the psilocybe slips down your gullet, you feel a heightened connection to the caverns around you\nUsed mushroom")
+    print(ansi.italics("As the psilocybe slips down your gullet, you feel a heightened connection to the caverns around you"),
+          f"\n{ansi.b_italics("Used mushroom")}")
     print("-----mini map-----")
     if pos[1] in (range(3)):  # defines which rows will be shown on the mini map based off player.pos
         row_bounds = (0, 5)  # first case is for when the player is near the top of the map
@@ -122,7 +127,7 @@ def use_mushroom(map: list[list[Tile.Tile]], pos: tuple[int, int]) -> None: # sk
         for item in row[item_bounds[0]:item_bounds[1]]:  # mimics what I did for row
             item.make_discovered()
             if item.pos == player.pos:
-                line += "\033[34mP\033[0m "  # makes P (the player) cyan
+                line += ansi.blue("P ")  # makes P (the player) blue
             else:
                 line += str(item) + " "
         print(line)
@@ -132,8 +137,9 @@ def mineTile(tilePos: tuple[int, int]):
     tileMineral: Minerals.mineralTypes = map[tilePos[1]][tilePos[0]].resourceType
     player.add_score(tileMineral)
     map[tilePos[1]][tilePos[0]].drainMineral()
-    print(tileMineral.miningDescription)
-    print(f"{tileMineral.description} mined (+{tileMineral.score_value}!) --> Current Score: {player.total_score}")
+    print(ansi.italics(tileMineral.miningDescription))
+    print(f"{ansi.b_italics("Mined Mineral")}: {ansi.g_bold(tileMineral.description)} "
+          f"({ansi.g_bold(f"+{tileMineral.score_value}!")}) --> {ansi.cyan(f"Current Score: {player.total_score}")}")
 
 
 def inspect_tile(tilePos: tuple[int, int]):
@@ -147,28 +153,32 @@ def inspect_tile(tilePos: tuple[int, int]):
         said_mineral = [fake_mineral[1], true_mineral, fake_mineral[0]]
     else:  # when true_mineral_pos is the 3rd position
         said_mineral = [fake_mineral[0], fake_mineral[1], true_mineral]
-    print(f"Hmm... I think I could find {said_mineral[0].description}, {said_mineral[1].description}, or {said_mineral[2].description} in this segment of the mine")
+    print(f"Hmm... I think I could find {ansi.g_bold(said_mineral[0].description)}, "
+                                      f"{ansi.g_bold(said_mineral[1].description)}, or "
+                                      f"{ansi.g_bold(said_mineral[2].description)} in this segment of the mine")
 
     if map[tilePos[1]][tilePos[0]].item != map[tilePos[1]][tilePos[0]].item.nothing: #if there is an item on the player's tile
-        print(f"While gleaming the mine for potential minerals, I found a {map[tilePos[1]][tilePos[0]].item.name} that I could grab if space allows")
+        print("While gleaming the mine for potential minerals, I found a "
+              f"{ansi.b_bold(map[tilePos[1]][tilePos[0]].item.name)} that I could grab if space allows")
 
 def check_pos(pos: tuple[int, int]): # didn't want player.pos in Tile.py
     global running
     if map[pos[1]][pos[0]].isExit: # if the player is on the exit
-        answer = input("Do you want to escape the mountains? (Yes or No): ").strip().lower()
+        answer = input(f"{ansi.cyan("Do you want to escape the mountains?")} "
+                       f"({ansi.blue("Yes")} or {ansi.blue("No")}): ").strip().lower()
         if answer in ("yes", "y", "escape", "exit"):
             player.exit_message()
             running = False
             player.actions_left = 0
         elif answer in ("no", "n", "nope", "nada", "stay"):
-            print("You decide to continue mining... hopefully your greed doesn't get the best of you")
+            print(ansi.italics("You decide to continue mining... hopefully your greed doesn't get the best of you"))
         else:
-            print('Please input a valid answer. Enter "Exit" to try again')
+            print(f'Please input a valid answer. Enter "{ansi.cyan("Exit")}" to try again')
     elif map[pos[1]][pos[0]].hasMaulwurf or map[pos[1]][pos[0]].cavedIn: #checks if the tile is valid
         if map[pos[1]][pos[0]].cavedIn: # gives feedback if it is caved in
-            print("Ow! The cavern you are in collapsed!")
+            print(f"Ow! The cavern you are in {ansi.red("collapsed!")}")
         elif map[pos[1]][pos[0]].hasMaulwurf: # if it is not caved in, gives feedback that there are Maulwurf
-            print("Oh no! An overwhelming horde of Maulwurf flooded into the cave!")
+            print(f"Oh no! An overwhelming horde of {ansi.yellow("Maulwurf")} flooded into the cave!")
 
         available_directions = []  # below checks to see if a given direction is valid, appending it if it is
         if pos[1] - 1 >= 0 and not (map[pos[1] - 1][pos[0]].cavedIn or map[pos[1] - 1][pos[0]].hasMaulwurf):
@@ -182,7 +192,8 @@ def check_pos(pos: tuple[int, int]): # didn't want player.pos in Tile.py
         if len(available_directions) == 0: # if there are no valid directions
             running = False
             player.actions_left = 0
-            print("YOU DIED -- Score: 0 \nThank you for playing Maulwurf")
+            print(ansi.red("YOU DIED") + f" -- {ansi.cyan("Score: 0")}"
+                                         f"\n{ansi.italics("Thank you for playing Zwerg: Trial Beneath the Stone")}")
         else:
             move(random.choice(available_directions), map) # else a random direction is picked to move
 
@@ -285,7 +296,7 @@ def showMap(map: list[list[Tile.Tile]]) -> None:
         line = ""
         for item in row:
             if item.pos == player.pos:
-                line += "\033[34mP\033[0m " # makes P (the player) blue
+                line += ansi.blue("P ") # makes P (the player) blue
             else:
                 line += str(item) + " "
         if workingRow  < len(Constants.mapExtras):
@@ -311,7 +322,7 @@ def show_mini_map(map: list[list[Tile.Tile]], pos: tuple[int, int]) -> None: # s
         line = "    "
         for item in row[item_bounds[0]:item_bounds[1]]: # mimics what I did for row
             if item.pos == player.pos:
-                line += "\033[34mP\033[0m " # makes P (the player) cyan
+                line += ansi.blue("P ") # makes P (the player) blue
             else:
                 line += str(item) + " "
         print(line)
@@ -319,18 +330,18 @@ def show_mini_map(map: list[list[Tile.Tile]], pos: tuple[int, int]) -> None: # s
 
 def helpMenu():
     alignmentString = "{:<10s} {:<20s} {:<10s}"
-    print("Welcome to the game! Here are some inputs you can use")
-    print(alignmentString.format("Rules", "Move (n, s, e, w)", "Grab") + "\n" +
+    print(ansi.italics("Welcome to the game! Here are some inputs you can use"))
+    print(ansi.italics(alignmentString.format("Rules", "Move (n, s, e, w)", "Grab") + "\n" +
           alignmentString.format("Objective", "Mine", "Use (dynamite, weapon)" + "\n" +
           alignmentString.format("Map", "Inspect", "Inventory") + "\n" +
-          alignmentString.format("Help", "Quit (game, quit)", "Escape")))
+          alignmentString.format("Help", "Quit (game, quit)", "Escape"))))
 
 
 def move(args: list[str], map: list[list[Tile.Tile]]):
     global player
     arg = args[0]
     if len(args) > 1:
-        print("all arguments past the first one have been discarded")
+        print(ansi.italics("all arguments past the first one have been discarded"))
     newPos: tuple[int, int] = (0, 0)
     match arg:
         case "n" | "north":
@@ -346,7 +357,8 @@ def move(args: list[str], map: list[list[Tile.Tile]]):
             newPos = (player.pos[0] - 1, player.pos[1] + 0)
             arg = "West"
         case _:
-            print(f"move: unknown argument \"{arg}\". Valid arguments include n, s, e, w, north, south, east, or west")
+            print(ansi.b_italics(f"move: unknown argument \"{arg}\". "
+                                 "Valid arguments include n, s, e, w, north, south, east, or west"))
             return
 
     YCordValid: bool = newPos[1] >= 0 and newPos[1] < Constants.mapHeight
@@ -356,17 +368,19 @@ def move(args: list[str], map: list[list[Tile.Tile]]):
         # happens regardless if the tile is cavedIn or hasMaulwurf, makes so they will show up on map
         if map[newPos[1]][newPos[0]].cavedIn:
             #tells the player if the tile has caved in, makes it show on map, hints at dynamite
-            print("It seems the cave has caved in that way... dynamite would be useful here")
+            print(f"It seems the cave has {ansi.red("caved in")} that way... "
+                  f"{ansi.b_bold("dynamite")} would be useful here")
         elif map[newPos[1]][newPos[0]].hasMaulwurf:
             #tells the player if the tile has Maulwurf, makes it show on map, hints at weapon
-            print("Terrible growling rings through the cavern that way, alongside a waft of blood... only a weapon would allow continuation")
+            print(f"Terrible {ansi.yellow("growling")} rings through the cavern that way, "
+                  f"alongside a waft of blood... only a {ansi.b_bold("weapon")} would allow continuation")
         else:
             player.pos = newPos #sets the player's position to the new one
             player.actions_left -= 1 #takes away an action after the player has successfully moved
-            print(f"Moved {arg}")
+            print(ansi.b_italics(f"Moved {arg}"))
             inspect_tile(newPos)
     else:
-            print("cannot move that direction")
+            print(ansi.italics("cannot move that direction"))
 
 def showInventory():
     for i in range(len(player.items)):
@@ -386,7 +400,7 @@ def handleInput(input: str):
         case "objective" | "lore" | "o":
             Constants.game_objective()
         case "maulwurf" | "read" | "continue":
-            Constants.entry_counter += Constants.maulwurf_description(Constants.entry_counter)
+            Constants.entry_counter += ansi.italics(Constants.maulwurf_description(Constants.entry_counter))
         case "move":
             move(arguments, map)
             show_mini_map(map, player.pos)
@@ -408,21 +422,21 @@ def handleInput(input: str):
                 arguments.insert(0, str(itemIndex + 1))
                 useItem(arguments, player.pos)
             except ValueError:
-                print("no dynamite in inventory")
+                print(ansi.b_italics("no dynamite in inventory"))
         case "weapon" | "fight" | "f" | "battle" | "b" | "kill":
             try:
                 itemIndex = player.items.index(Constants.Items.weapon)
                 arguments.insert(0, str(itemIndex + 1))
                 useItem(arguments, player.pos)
             except ValueError:
-                print("no weapon in inventory")
+                print(ansi.b_italics("no weapon in inventory"))
         case "mushroom" | "shroom" | "psilocybe" | "conecsiemuer" | "p":
             try:
                 itemIndex = player.items.index(Constants.Items.mushroom)
                 arguments.insert(0, str(itemIndex + 1))
                 useItem(arguments, player.pos)
             except ValueError:
-                print("no mushroom in inventory")
+                print(ansi.b_italics("no mushroom in inventory"))
         case "use":
             useItem(arguments, player.pos)
         case "help":
@@ -441,17 +455,18 @@ def handleInput(input: str):
             if Constants.devMode:
                 player.actions_left -= 12
         case _:
-            print(f"mine game: {command}: not found.")
+            print(ansi.b_italics(f"mine game: {ansi.bold_to_ital(command)}: not found."))
 
 
 # beginning of game code
 daysPassed = 0
 player: Player.Player = Player.Player()
+ansi: Constants.AnsiColors = Constants.AnsiColors()
 map = generateMap()
 running = True
 
 Constants.start_game_text()
-reload_or_start_new()
+# reload_or_start_new() #TODO: uncomment after completing menu
 helpMenu()
 
 
