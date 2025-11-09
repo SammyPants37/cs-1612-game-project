@@ -15,6 +15,14 @@ def reload_or_start_new():
         print('(Please input either "New" or "Load")')
         reload_or_start_new()
 
+def play_again():
+    answer = input("\nWould you like to play again? (Yes or No): ").strip().lower()
+    if answer == "yes" or answer == "y":
+        return True
+    else:
+        print("Thank you for playing Zwerg. Goodbye!")
+        return False
+
 def drop_item(tilePos: tuple[int, int]):
     # grab_item takes the player's tile's item, spits out whatever will have to be dropped
     dropped_item: Constants.Items = player.grab_item(map[tilePos[1]][tilePos[0]].item)
@@ -24,6 +32,12 @@ def drop_item(tilePos: tuple[int, int]):
 def useItem(args: list[str], playerPos: tuple[int, int]):
     global player
     itemIndex = args[0]
+
+    if len(args) > 1:
+        direction = args[1]
+    else:
+        print("missing argument for direction to use the item.")
+        return
 
     if itemIndex.isdigit():
         itemIndex = int(itemIndex) - 1
@@ -36,19 +50,6 @@ def useItem(args: list[str], playerPos: tuple[int, int]):
         return
 
     item = player.items[itemIndex]
-
-    if item == Constants.Items.mushroom:
-        use_mushroom(map, player.pos)
-        player.items[itemIndex] = Constants.Items.nothing
-        player.actions_left -= 2
-        return
-
-    if len(args) > 1:
-        direction = args[1]
-    else:
-        print("missing argument for direction to use the item.")
-        return
-
 
     itemUsable: bool = False
 
@@ -89,44 +90,14 @@ def useItem(args: list[str], playerPos: tuple[int, int]):
             print("Please input a valid direction. Valid directions include north, south, east, and west.")
 
     if itemUsable:
-        if item.name == "weapon": maulwurf_remains(Minerals.mineralTypes.maulwurf)
-        print(f"Used {item.name}", end=", ")
+        print(f"Used {item.name}")
         player.items[itemIndex] = Constants.Items.nothing
         player.actions_left -= 1
         move([direction], map)
     else:
-        print("Item is not usable in that direction.")
+        print("Item is not useable in that direction.")
             
-def maulwurf_remains(monster: Minerals.mineralTypes):
-    player.add_score(monster)
-    print(monster.miningDescription)
-    print(f"Gathered {monster.description} (+{monster.score_value}!) --> Current Score: {player.total_score}")
 
-def use_mushroom(map: list[list[Tile.Tile]], pos: tuple[int, int]) -> None: # skeleton based off of mini map
-    print(f"As the psilocybe slips down your gullet, you feel a heightened connection to the caverns around you\nUsed mushroom")
-    print("-----mini map-----")
-    if pos[1] in (range(3)):  # defines which rows will be shown on the mini map based off player.pos
-        row_bounds = (0, 5)  # first case is for when the player is near the top of the map
-    elif pos[1] in (range((mapHeight - 3), mapHeight)):  # then when the player is near the bottom
-        row_bounds = ((mapHeight - 5), mapHeight)
-    else:  # lastly, all in between positions are defined directly from player.pos
-        row_bounds = ((pos[1] - 2), (pos[1] + 3))
-    if pos[0] in (range(3)):  # defines which item will be shown on the mini map based off player.pos (similar way to row)
-        item_bounds = (0, 5)
-    elif pos[0] in (range((mapWidth - 3), mapWidth)):
-        item_bounds = ((mapWidth - 5), mapWidth)
-    else:
-        item_bounds = ((pos[0] - 2), (pos[0] + 3))
-    for row in map[row_bounds[0]:row_bounds[1]]:
-        line = "    "
-        for item in row[item_bounds[0]:item_bounds[1]]:  # mimics what I did for row
-            item.make_discovered()
-            if item.pos == player.pos:
-                line += "\033[34mP\033[0m "  # makes P (the player) cyan
-            else:
-                line += str(item) + " "
-        print(line)
-    print("------------------")
 
 def mineTile(tilePos: tuple[int, int]):
     tileMineral: Minerals.mineralTypes = map[tilePos[1]][tilePos[0]].resourceType
@@ -182,7 +153,7 @@ def check_pos(pos: tuple[int, int]): # didn't want player.pos in Tile.py
         if len(available_directions) == 0: # if there are no valid directions
             running = False
             player.actions_left = 0
-            print("YOU DIED -- Score: 0 \nThank you for playing Maulwurf")
+            print(f"YOU DIED -- Score: 0 \nThank you for playing Maulwurf")
         else:
             move(random.choice(available_directions), map) # else a random direction is picked to move
 
@@ -192,8 +163,8 @@ def occurrence_probability(numDays: int):
     while possibleEvents > 0: #while potential events haven't occurred
         event_occurred = random.randint(1,Constants.DenominatorEventsOccur) # DEO = 6
         if event_occurred == 1: # 1/6 chance of occurring
-            rand_event = random.choices(("infest", "cave in"), weights = Constants.event_weights)[0]
-            if rand_event == "infest":
+            rand_event = random.randint(1, 2)
+            if rand_event == 1:
                 rand_den_infest()
             else:
                 rand_cave_in()
@@ -374,7 +345,7 @@ def showInventory():
 
 
 def handleInput(input: str):
-    global running
+    global running, user_quit
     command = input.split(" ")[0].lower().strip()
     arguments = input.split(" ")[1:] # args will be passed to each command when they're implemented
     arguments = [arg.lower().strip() for arg in arguments]
@@ -400,7 +371,7 @@ def handleInput(input: str):
             inspect_tile(player.pos)
         case "compass" | "map" | "check" | "c":
             showMap(map)
-        case "grab" | "pick" | "g":
+        case "grab" | "pick" | "g" | "p":
             drop_item(player.pos)
         case "dynamite" | "d":
             try:
@@ -416,13 +387,6 @@ def handleInput(input: str):
                 useItem(arguments, player.pos)
             except ValueError:
                 print("no weapon in inventory")
-        case "mushroom" | "shroom" | "psilocybe" | "conecsiemuer" | "p":
-            try:
-                itemIndex = player.items.index(Constants.Items.mushroom)
-                arguments.insert(0, str(itemIndex + 1))
-                useItem(arguments, player.pos)
-            except ValueError:
-                print("no mushroom in inventory")
         case "use":
             useItem(arguments, player.pos)
         case "help":
@@ -435,6 +399,7 @@ def handleInput(input: str):
                 print("Thank you for playing Zwerg. Goodbye!")
                 running = False
                 player.actions_left = 0
+                user_quit = True
             else:
                 print("Are you sure you would like to quit? Progress will not be saved...\n(Please type in Quit Game to confirm).")
         case "z": # got sick of spamming mine
@@ -445,27 +410,35 @@ def handleInput(input: str):
 
 
 # beginning of game code
-daysPassed = 0
-player: Player.Player = Player.Player()
-map = generateMap()
-running = True
-
 Constants.start_game_text()
-reload_or_start_new()
-helpMenu()
 
+while True:
+    daysPassed = 0
+    player: Player.Player = Player.Player()
+    map = generateMap()
+    running = True
+    user_quit = False
 
-# game loop
-while running:
-    player.actions_left += Constants.NumPlayerMoves #refunds 3 actions
-    # run player moves
-    while player.actions_left > 0:
-        check_pos(player.pos) # checks if Maulwurf or CaveIn occurred on the player's tile, kicking them to a new tile if so
-        if player.actions_left == 0: break
-        command = input(">>> ")
-        handleInput(command)
-    if running:
-        print("as you go to sleep for the evening, you hear the rumbles of change in the mines")
-        occurrence_probability(daysPassed)
-        daysPassed += 1
+    reload_or_start_new()
+    helpMenu()
+
+    # game loop
+    while running:
+        player.actions_left += Constants.NumPlayerMoves #refunds 3 actions
+        # run player moves
+        while player.actions_left > 0:
+            check_pos(player.pos) # checks if Maulwurf or CaveIn occurred on the player's tile, kicking them to a new tile if so
+            if player.actions_left == 0: break
+            command = input(">>> ")
+            handleInput(command)
+        if running:
+            print("as you go to sleep for the evening, you hear the rumbles of change in the mines")
+            occurrence_probability(daysPassed)
+            daysPassed += 1
+    
+    # After game ends, ask if player wants to play again (unless user quit)
+    if user_quit:
+        break
+    if not play_again():
+        break
 
