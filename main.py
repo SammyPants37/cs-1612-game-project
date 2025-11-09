@@ -153,7 +153,7 @@ def check_pos(pos: tuple[int, int]): # didn't want player.pos in Tile.py
         if len(available_directions) == 0: # if there are no valid directions
             running = False
             player.actions_left = 0
-            print(f"YOU DIED -- Score: {player.total_score} \nThank you for playing Maulwurf")
+            print(f"YOU DIED -- Score: 0 \nThank you for playing Maulwurf")
         else:
             move(random.choice(available_directions), map) # else a random direction is picked to move
 
@@ -345,7 +345,7 @@ def showInventory():
 
 
 def handleInput(input: str):
-    global running
+    global running, user_quit
     command = input.split(" ")[0].lower().strip()
     arguments = input.split(" ")[1:] # args will be passed to each command when they're implemented
     arguments = [arg.lower().strip() for arg in arguments]
@@ -399,6 +399,7 @@ def handleInput(input: str):
                 print("Thank you for playing Zwerg. Goodbye!")
                 running = False
                 player.actions_left = 0
+                user_quit = True
             else:
                 print("Are you sure you would like to quit? Progress will not be saved...\n(Please type in Quit Game to confirm).")
         case "z": # got sick of spamming mine
@@ -416,6 +417,7 @@ while True:
     player: Player.Player = Player.Player()
     map = generateMap()
     running = True
+    user_quit = False
 
     reload_or_start_new()
     helpMenu()
@@ -434,9 +436,9 @@ while True:
             occurrence_probability(daysPassed)
             daysPassed += 1
     
-    # After game ends, ask if player wants to play again
-    if play_again():
-        continue
-    else:
+    # After game ends, ask if player wants to play again (unless user quit)
+    if user_quit:
+        break
+    if not play_again():
         break
 
