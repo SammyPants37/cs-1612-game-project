@@ -480,7 +480,12 @@ while running:
         command = input(">>> ")
         handleInput(command)
     if running:
-        print("as you go to sleep for the evening, you hear the rumbles of change in the mines")
         occurrence_probability(daysPassed)
         daysPassed += 1
+        z_calendar = Constants.zwerg_calendar_system(daysPassed)
+        # z_calendar = [day_of_week, week, month, day_of_month, month_name, year]
+        print(ansi.italics(f"\n{ansi.cyan(f"Week {z_calendar[1]}")}") + ansi.italics(f": {z_calendar[0]}, {ansi.cyan(f"Day {z_calendar[2]}")} ") +
+                           ansi.italics(f"of {z_calendar[4]} ({ansi.cyan(f"{z_calendar[2]}/{z_calendar[3]}/{z_calendar[5]}")}" + ansi.italics(")")))
+        print(ansi.italics("As you go to sleep for the evening, you hear the rumbles of change in the mines"))
+
 

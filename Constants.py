@@ -2,7 +2,38 @@ from enum import Enum
 
 #Below is where we will import our constant values
 
-def event_number_scaler(x: int) -> int: #current formula for scaling how many events will have a 1/6th chance of occurring
+def zwerg_calendar_system(days_passed): # created a calendar system not based on celestial phenomena
+    year = 625177
+    month = 1
+    weekdays = {1 : "Agaricus", 2 : "Procambarus", 3 : "Proteus", 4 : "Conecsimus"}
+    months = {1 : "Dreiundfzer", 2 : "Einundfzer", 3 : "Dreiunver", 4 : "Neunzehnver", 5 : "Neunieber", 6 : "Dreicember",}
+    month_name = months[month]
+    while days_passed > 59:
+        days_passed -= 59
+        year += 1
+    day_of_month = days_passed
+    if days_passed > 17:
+        week = ((days_passed - 18) // 3) + 6
+        day_of_week = weekdays[(days_passed - 17) - (week - 6) * 3]
+    elif days_passed > 13:
+        week = 5
+        day_of_week = weekdays[days_passed - 13]
+    elif days_passed > 4:
+        week = ((days_passed - 5) // 3) + 2
+        day_of_week = weekdays[(days_passed - 4) - ((week - 2) * 3)]
+    else: # days_passed > 0:
+        week = 1
+        day_of_week = weekdays[days_passed]
+    if week > 4:
+        month = ((week - 5) // 3) + 2
+        month_name = months[month]
+        day_of_month = days_passed - 13
+    if month > 2:
+        day_of_month = (days_passed - 23) - (9 * (month - 3))
+    info = [day_of_week, week, month, day_of_month, month_name, year]
+    return info
+
+def event_number_scaler(x: int) -> int: # formula for scaling how many events will have a 1/6th chance of occurring
     return int((1 / 50) * x ** 2 + 1)
 
 event_weights = (5,4) # weights for choosing which event occurs. (infest, cave in)
