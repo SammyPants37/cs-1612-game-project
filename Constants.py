@@ -190,7 +190,7 @@ def maulwurf_description(entry_num):
                         "Their hard exteriors are riddled with a variety of rare minerals and stones, which\nmake it a highly prized trophy that any race would respect due to the hazards it takes to collect.",
                         "No one’s yet figured out how to eat it though, or make it hatch for that matter.",
                         "Would make one wonder whether it's an egg at all if the Maulwurf didn’t guard them so ferociously....")
-    print(ansi.italics(f"--Entry #{entry_num}--\n{description_list[entry_num]}\n--Reinput to continue reading--"))
+    print(ansi.italics(f"--Entry #{entry_num}--\n{ansi.italics(description_list[entry_num])}\n--Reinput to continue reading--"))
     if entry_num == 22:
         return -22
     return 1

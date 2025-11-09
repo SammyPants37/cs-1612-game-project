@@ -400,7 +400,7 @@ def handleInput(input: str):
         case "objective" | "lore" | "o":
             Constants.game_objective()
         case "maulwurf" | "read" | "continue":
-            Constants.entry_counter += ansi.italics(Constants.maulwurf_description(Constants.entry_counter))
+            Constants.entry_counter += Constants.maulwurf_description(Constants.entry_counter)
         case "move":
             move(arguments, map)
             show_mini_map(map, player.pos)
