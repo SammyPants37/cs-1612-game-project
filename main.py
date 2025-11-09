@@ -15,6 +15,14 @@ def reload_or_start_new():
         print('(Please input either "New" or "Load")')
         reload_or_start_new()
 
+def play_again():
+    answer = input("\nWould you like to play again? (Yes or No): ").strip().lower()
+    if answer == "yes" or answer == "y":
+        return True
+    else:
+        print("Thank you for playing Zwerg. Goodbye!")
+        return False
+
 def drop_item(tilePos: tuple[int, int]):
     # grab_item takes the player's tile's item, spits out whatever will have to be dropped
     dropped_item: Constants.Items = player.grab_item(map[tilePos[1]][tilePos[0]].item)
@@ -182,7 +190,7 @@ def check_pos(pos: tuple[int, int]): # didn't want player.pos in Tile.py
         if len(available_directions) == 0: # if there are no valid directions
             running = False
             player.actions_left = 0
-            print("YOU DIED -- Score: 0 \nThank you for playing Maulwurf")
+            print(f"YOU DIED -- Score: 0 \nThank you for playing Maulwurf")
         else:
             move(random.choice(available_directions), map) # else a random direction is picked to move
 
@@ -374,7 +382,7 @@ def showInventory():
 
 
 def handleInput(input: str):
-    global running
+    global running, user_quit
     command = input.split(" ")[0].lower().strip()
     arguments = input.split(" ")[1:] # args will be passed to each command when they're implemented
     arguments = [arg.lower().strip() for arg in arguments]
@@ -435,6 +443,7 @@ def handleInput(input: str):
                 print("Thank you for playing Zwerg. Goodbye!")
                 running = False
                 player.actions_left = 0
+                user_quit = True
             else:
                 print("Are you sure you would like to quit? Progress will not be saved...\n(Please type in Quit Game to confirm).")
         case "z": # got sick of spamming mine
@@ -445,27 +454,35 @@ def handleInput(input: str):
 
 
 # beginning of game code
-daysPassed = 0
-player: Player.Player = Player.Player()
-map = generateMap()
-running = True
-
 Constants.start_game_text()
-reload_or_start_new()
-helpMenu()
 
+while True:
+    daysPassed = 0
+    player: Player.Player = Player.Player()
+    map = generateMap()
+    running = True
+    user_quit = False
 
-# game loop
-while running:
-    player.actions_left += Constants.NumPlayerMoves #refunds 3 actions
-    # run player moves
-    while player.actions_left > 0:
-        check_pos(player.pos) # checks if Maulwurf or CaveIn occurred on the player's tile, kicking them to a new tile if so
-        if player.actions_left == 0: break
-        command = input(">>> ")
-        handleInput(command)
-    if running:
-        print("as you go to sleep for the evening, you hear the rumbles of change in the mines")
-        occurrence_probability(daysPassed)
-        daysPassed += 1
+    reload_or_start_new()
+    helpMenu()
+
+    # game loop
+    while running:
+        player.actions_left += Constants.NumPlayerMoves #refunds 3 actions
+        # run player moves
+        while player.actions_left > 0:
+            check_pos(player.pos) # checks if Maulwurf or CaveIn occurred on the player's tile, kicking them to a new tile if so
+            if player.actions_left == 0: break
+            command = input(">>> ")
+            handleInput(command)
+        if running:
+            print("as you go to sleep for the evening, you hear the rumbles of change in the mines")
+            occurrence_probability(daysPassed)
+            daysPassed += 1
+    
+    # After game ends, ask if player wants to play again (unless user quit)
+    if user_quit:
+        break
+    if not play_again():
+        break
 
