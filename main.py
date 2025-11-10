@@ -312,13 +312,19 @@ def show_mini_map(map: list[list[Tile.Tile]], pos: tuple[int, int]) -> None: # s
         print(line)
     print("------------------")
 
-def helpMenu():
-    alignmentString = "{:<10s} {:<20s} {:<10s}"
-    print("Welcome to the game! Here are some inputs you can use")
-    print(alignmentString.format("Rules", "Move (n, s, e, w)", "Grab") + "\n" +
-          alignmentString.format("Objective", "Mine", "Use (dynamite, weapon)" + "\n" +
-          alignmentString.format("Map", "Inspect", "Inventory") + "\n" +
-          alignmentString.format("Help", "Quit (game, quit)", "Escape")))
+def helpMenu(args: list[str]):
+    if args[0] == "":
+        alignmentString = "{:<10s} {:<20s} {:<10s}"
+        print("Welcome to the game! Here are some inputs you can use")
+        print(alignmentString.format("Rules", "Move (n, s, e, w)", "Grab") + "\n" +
+              alignmentString.format("Objective", "Mine", "Use (dynamite, weapon)" + "\n" +
+              alignmentString.format("Map", "Inspect", "Inventory") + "\n" +
+              alignmentString.format("Help", "Quit (game, quit)", "Escape")))
+    else:
+        if args[0] in Constants.helpText:
+            print(Constants.helpText[args[0]])
+        else:
+            print(f"no such help page help pages include: {", ".join(Constants.helpText.keys())}")
 
 
 def move(args: list[str], map: list[list[Tile.Tile]]):
@@ -422,7 +428,7 @@ def handleInput(input: str):
             useItem(arguments, player.pos)
         case "help":
             # show the help menu when the help command is run
-            helpMenu()
+            helpMenu(arguments)
         case "inventory" | "i":
             showInventory()
         case "quit" | "q":
@@ -447,7 +453,7 @@ running = True
 
 Constants.start_game_text()
 reload_or_start_new()
-helpMenu()
+helpMenu([""])
 
 
 # game loop
