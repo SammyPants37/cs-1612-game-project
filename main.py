@@ -138,7 +138,7 @@ def mineTile(tilePos: tuple[int, int]):
     player.add_score(tileMineral)
     map[tilePos[1]][tilePos[0]].drainMineral()
     print(ansi.italics(tileMineral.miningDescription))
-    print(f"{ansi.b_italics("Mined Mineral")}: {ansi.g_bold(tileMineral.description)} "
+    print(f"{ansi.b_italics("Mined Mineral")}: {ansi.italics(ansi.green(tileMineral.description))} "
           f"({ansi.g_bold(f"+{tileMineral.score_value}!")}) --> {ansi.cyan(f"Current Score: {player.total_score}")}")
 
 
@@ -167,7 +167,7 @@ def check_pos(pos: tuple[int, int]): # didn't want player.pos in Tile.py
         answer = input(f"{ansi.cyan("Do you want to escape the mountains?")} "
                        f"({ansi.blue("Yes")} or {ansi.blue("No")}): ").strip().lower()
         if answer in ("yes", "y", "escape", "exit"):
-            player.exit_message()
+            player.exit_message(z_calendar)
             running = False
             player.actions_left = 0
         elif answer in ("no", "n", "nope", "nada", "stay"):
@@ -483,7 +483,7 @@ while running:
         occurrence_probability(daysPassed)
         daysPassed += 1
         z_calendar = Constants.zwerg_calendar_system(daysPassed)
-        # z_calendar = [day_of_week, week, month, day_of_month, month_name, year]
+        # z_calendar = [day_of_week, week, month, day_of_month, month_name, year, weekday_num]
         print(ansi.italics(f"\n{ansi.cyan(f"Week {z_calendar[1]}")}") + ansi.italics(f": {z_calendar[0]}, {ansi.cyan(f"Day {z_calendar[3]}")} ") +
                            ansi.italics(f"of {z_calendar[4]} ({ansi.cyan(f"{z_calendar[2]}/{z_calendar[3]}/{z_calendar[5]}")}" + ansi.italics(")")))
         print(ansi.italics("As you go to sleep for the evening, you hear the rumbles of change in the mines"))
