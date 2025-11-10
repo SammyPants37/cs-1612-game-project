@@ -330,9 +330,9 @@ def helpMenu(args: list[str]):
         alignmentString = "{:<10s} {:<20s} {:<10s}"
         print("Welcome to the game! Here are some inputs you can use")
         print(alignmentString.format("Rules", "Move (n, s, e, w)", "Grab") + "\n" +
-              alignmentString.format("Objective", "Mine", "Use (dynamite, weapon)" + "\n" +
+              alignmentString.format("Objective", "Mine", "Use (dynamite, weapon, mushroom)" + "\n" +
               alignmentString.format("Map", "Inspect", "Inventory") + "\n" +
-              alignmentString.format("Help", "Quit (game, quit)", "Escape")))
+              alignmentString.format("Help (command)", "Quit (game, quit)", "")))
     else:
         if args[0] in Constants.helpText:
             print(Constants.helpText[args[0]])
