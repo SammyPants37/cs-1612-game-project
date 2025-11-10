@@ -326,7 +326,7 @@ def show_mini_map(map: list[list[Tile.Tile]], pos: tuple[int, int]) -> None: # s
     print("------------------")
 
 def helpMenu(args: list[str]):
-    if args[0] == "":
+    if args[0] == "": # show the main help menu if no arguement is supplied
         alignmentString = "{:<10s} {:<20s} {:<10s}"
         print("Welcome to the game! Here are some inputs you can use")
         print(alignmentString.format("Rules", "Move (n, s, e, w)", "Grab") + "\n" +
@@ -337,7 +337,12 @@ def helpMenu(args: list[str]):
         if args[0] in Constants.helpText:
             print(Constants.helpText[args[0]])
         else:
-            print(f"no such help page help pages include: {", ".join(Constants.helpText.keys())}")
+            for command in Constants.commandAliases: # wish I didn't have to iterate over the aliases but its the best solution at the moment
+                for item in Constants.commandAliases[command]:
+                    if args[0] == item:
+                       print(Constants.helpText[command]) 
+                       return
+            print(f"no such help page. Help pages include: {", ".join(Constants.helpText.keys())}")
 
 
 def move(args: list[str], map: list[list[Tile.Tile]]):
