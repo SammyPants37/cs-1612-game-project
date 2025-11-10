@@ -5,7 +5,7 @@ ansi: Constants.AnsiColors = Constants.AnsiColors()
 
 def mineral_bag_amounts(self, weekday_num: int, day_of_month: int, week: int, month: int, year: int):
     print(f"------{ansi.bold_to_ital("Mineral Tally") + ansi.reset()}------")
-    bonus_mult = (month / Events_scal) * (week + (19 * (year - 625177))) * (10 ** (year - 625179) / Events_scal)
+    bonus_mult = (month / Events_scal) * (week + (19 * (year - 625177))) * (Events_scal ** (year - 625178))
     bonus_add = (weekday_num * day_of_month)
     total_bonus = 0
     for minerals in Constants.Minerals.mineralTypes:
@@ -14,14 +14,15 @@ def mineral_bag_amounts(self, weekday_num: int, day_of_month: int, week: int, mo
         for items in range(0, len(self.minerals_in_bag)):
             if minerals == self.minerals_in_bag[items]:
                 counter += 1
+            else: continue
             if minerals.code in (6,7,8,9,10,11,13):
                 bonus_score += minerals.score_value
                 total_bonus += minerals.score_value
         print(ansi.italics(f"{ansi.g_bold(minerals.description)} "
                            f"({ansi.g_bold(f"+{minerals.score_value}")}) {ansi.cyan(f"x {counter}")}" +
-                           ansi.yellow(ansi.bold_to_ital(f" BONUS! (+{int(bonus_score * bonus_mult + bonus_add)})"))))
+                           ansi.yellow(ansi.bold_to_ital(f" BONUS! (+{int(bonus_score * bonus_mult + (counter * bonus_add))})"))))
     print("-------------------------")
-    return int(total_bonus * bonus_mult + bonus_add * 14)
+    return int(total_bonus * bonus_mult + (bonus_add * 14 * len(self.minerals_in_bag)))
 
 class Player:
 
