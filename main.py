@@ -16,6 +16,14 @@ def reload_or_start_new(): # leaving as skeleton, might want to incorporate into
         print('(Please input either "New" or "Load")')
         reload_or_start_new()
 
+def play_again():
+    answer = input("\nWould you like to play again? (Yes or No): ").strip().lower()
+    if answer == "yes" or answer == "y":
+        return True
+    else:
+        print("Thank you for playing Zwerg. Goodbye!")
+        return False
+
 def drop_item(tilePos: tuple[int, int]):
     # grab_item takes the player's tile's item, spits out whatever will have to be dropped
     dropped_item: Constants.Items = player.grab_item(map[tilePos[1]][tilePos[0]].item)
@@ -328,13 +336,24 @@ def show_mini_map(map: list[list[Tile.Tile]], pos: tuple[int, int]) -> None: # s
         print(line)
     print("------------------")
 
-def helpMenu():
-    alignmentString = "{:<10s} {:<20s} {:<10s}"
-    print(ansi.italics("Welcome to the game! Here are some inputs you can use"))
-    print(ansi.italics(alignmentString.format("Rules", "Move (n, s, e, w)", "Grab") + "\n" +
-          alignmentString.format("Objective", "Mine", "Use (dynamite, weapon)" + "\n" +
-          alignmentString.format("Map", "Inspect", "Inventory") + "\n" +
-          alignmentString.format("Help", "Quit (game, quit)", "Escape"))))
+def helpMenu(args: list[str]):
+    if args[0] == "": # show the main help menu if no arguement is supplied
+        alignmentString = "{:<10s} {:<20s} {:<10s}"
+        print(ansi.italics("Welcome to the game! Here are some inputs you can use"))
+        print(ansi.italics(alignmentString.format("Rules", "Move (n, s, e, w)", "Grab") + "\n" +
+              alignmentString.format("Objective", "Mine", "Use (dynamite, weapon, mushroom)" + "\n" +
+              alignmentString.format("Map", "Inspect", "Inventory") + "\n" +
+              alignmentString.format("Help (command)", "Quit (game, quit)", ""))))
+    else:
+        if args[0] in Constants.helpText:
+            print(ansi.italics(Constants.helpText[args[0]]))
+        else:
+            for command in Constants.commandAliases: # wish I didn't have to iterate over the aliases but its the best solution at the moment
+                for item in Constants.commandAliases[command]:
+                    if args[0] == item:
+                       print(ansi.italics(Constants.helpText[command])) 
+                       return
+            print(ansi.italics(f"no such help page. Help pages include: {", ".join(Constants.helpText.keys())}"))
 
 
 def move(args: list[str], map: list[list[Tile.Tile]]):
@@ -388,7 +407,7 @@ def showInventory():
 
 
 def handleInput(input: str):
-    global running
+    global running, user_quit
     command = input.split(" ")[0].lower().strip()
     arguments = input.split(" ")[1:] # args will be passed to each command when they're implemented
     arguments = [arg.lower().strip() for arg in arguments]
@@ -441,7 +460,7 @@ def handleInput(input: str):
             useItem(arguments, player.pos)
         case "help":
             # show the help menu when the help command is run
-            helpMenu()
+            helpMenu(arguments)
         case "inventory" | "i":
             showInventory()
         case "quit" | "q":
@@ -449,6 +468,7 @@ def handleInput(input: str):
                 print("Thank you for playing Zwerg. Goodbye!")
                 running = False
                 player.actions_left = 0
+                user_quit = True
             else:
                 print("Are you sure you would like to quit? Progress will not be saved...\n(Please type in Quit Game to confirm).")
         case "z": # got sick of spamming mine
@@ -459,33 +479,41 @@ def handleInput(input: str):
 
 
 # beginning of game code
-daysPassed = 0
-player: Player.Player = Player.Player()
-ansi: Constants.AnsiColors = Constants.AnsiColors()
-map = generateMap()
-running = True
-
 Constants.start_game_text()
-# reload_or_start_new() #TODO: uncomment after completing menu
-helpMenu()
 
 
-# game loop
-while running:
-    player.actions_left += Constants.NumPlayerMoves #refunds 3 actions
-    # run player moves
-    while player.actions_left > 0:
-        check_pos(player.pos) # checks if Maulwurf or CaveIn occurred on the player's tile, kicking them to a new tile if so
-        if player.actions_left == 0: break
-        command = input(">>> ")
-        handleInput(command)
-    if running:
-        occurrence_probability(daysPassed)
-        daysPassed += 1
-        z_calendar = Constants.zwerg_calendar_system(daysPassed)
-        # z_calendar = [day_of_week, week, month, day_of_month, month_name, year, weekday_num]
-        print(ansi.italics(f"\n{ansi.cyan(f"Week {z_calendar[1]}")}") + ansi.italics(f": {z_calendar[0]}, {ansi.cyan(f"Day {z_calendar[3]}")} ") +
+while True:
+    daysPassed = 0
+    player: Player.Player = Player.Player()
+    ansi: Constants.AnsiColors = Constants.AnsiColors()
+    map = generateMap()
+    running = True
+    user_quit = False
+
+    # reload_or_start_new() #TODO: uncomment after completing menu
+    helpMenu([""])
+
+    # game loop
+    while running:
+        player.actions_left += Constants.NumPlayerMoves #refunds 3 actions
+        # run player moves
+        while player.actions_left > 0:
+            check_pos(player.pos) # checks if Maulwurf or CaveIn occurred on the player's tile, kicking them to a new tile if so
+            if player.actions_left == 0: break
+            command = input(">>> ")
+            handleInput(command)
+        if running:
+            occurrence_probability(daysPassed)
+            daysPassed += 1
+            z_calendar = Constants.zwerg_calendar_system(daysPassed)
+            # z_calendar = [day_of_week, week, month, day_of_month, month_name, year, weekday_num]
+            print(ansi.italics(f"\n{ansi.cyan(f"Week {z_calendar[1]}")}") + ansi.italics(f": {z_calendar[0]}, {ansi.cyan(f"Day {z_calendar[3]}")} ") +
                            ansi.italics(f"of {z_calendar[4]} ({ansi.cyan(f"{z_calendar[2]}/{z_calendar[3]}/{z_calendar[5]}")}" + ansi.italics(")")))
-        print(ansi.italics("As you go to sleep for the evening, you hear the rumbles of change in the mines"))
-
+            print(ansi.italics("As you go to sleep for the evening, you hear the rumbles of change in the mines"))
+    
+    # After game ends, ask if player wants to play again (unless user quit)
+    if user_quit:
+        break
+    if not play_again():
+        break
 

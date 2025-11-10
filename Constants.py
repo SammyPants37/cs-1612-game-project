@@ -210,3 +210,55 @@ def start_game_text():
           f"Between lies {ansi.red("danger")}, {ansi.green("treasure")}, and the " +
           ansi.b_italics("chance to carve your name into the history books") + ".\n"
           f" --- {ansi.blue(ansi.bold_to_ital("May Fortunes be for the Living"))} ---\n")
+
+
+
+helpText: dict[str, str] = {
+    "rules": "rules: rules, r\n" +
+            "    show the rules of the game",
+    "objective": "objective: objective, lore, o\n" +
+                "    show the objective of the game",
+    "maulwurf": "maulwurf: maulwurf, read\n" +
+               "    show the description of a maulwurf.\n    enter run maulwurf or continue again to show the next line of the description",
+    "move": "move: move [direction], n, s, e, w\n" +
+            "    Move the player in the specified direction.\n\n"+
+            "    Options:\n"+
+            "        n    move the player to the north\n"+
+            "        s    move the player to the south\n"+
+            "        e    move the player to the east\n"+
+            "        w    move the player to the west\n",
+    "mine": "mine: mine, m\n" +
+             "    mine the the tile that the player is on",
+    "inspect": "inspect: inspect, look, l\n" +
+                "    inspect the tile that the player is currently standing on.\n    Gives 3 possible minerals (guaranteed if Worthless Rock or Maulwurf Egg)",
+    "map": "map: map, compass, check, c\n" +
+            "    show the map of the mines",
+    "grab": "grab: grab, g, pick\n"+
+            "    grab the item from the tile the player is standing on.\n\n"+
+            "    if there is no item on the tile, nothing will be changed.\n\n"+
+            "    if there is an item on the tile and your inventory is full, you will grab the item from the tile and drop an item of a separate type.",
+    "use": "use: use [index] [direction], dynamite [direction], weapon [direction], mushroom [direction]\n" +
+            "    use a specified item in the specified direction.\n\n"+
+            "    if the item cannot be used in the direction, nothing will happen.\n\n"+
+            "    Commands that are the item name only take a direction and attempt to use the item they are named after in the specified dierection.",
+    "help": "help: help [command]\n" + 
+            "    If run with no command input, shows most available commands.\n\n" +
+            "    If run with a command input, shows the help page for that command",
+    "inventory": "inventory: inventory, i\n" + 
+                "    Show the inventory of the player.",
+    "quit": "quit: quit [game/quit/yes/y/q]\n" + 
+            "    quits the game if given a confirmation."}
+
+commandAliases: dict[str, list[str]] = {"rules": ["r"],
+                                        "objective": ["lore", "o"],
+                                        "maulwurf": ["read"],
+                                        "move": ["n", "s", "e", "w"],
+                                        "mine": ["m"],
+                                        "inspect": ["look", "l"],
+                                        "map": ["map", "compass", "check", "c"],
+                                        "grab": ["g", "pick"],
+                                        "use": ["dynamite", "weapon", "mushroom"],
+                                        "help": [],
+                                        "inventory": ["i"],
+                                        "quit": ["q"]}
+
