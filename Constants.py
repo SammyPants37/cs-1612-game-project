@@ -156,13 +156,13 @@ helpText: dict[str, str] = {
     "mine": "mine: mine, m\n" +
              "    mine the the tile that the player is on",
     "inspect": "inspect: inspect, look, l\n" +
-                "    inspect the tile that the player is currently standing on",
+                "    inspect the tile that the player is currently standing on.\n    Gives 3 possible minerals (guaranteed if Worthless Rock or Maulwurf Egg)",
     "map": "map: map, compass, check, c\n" +
             "    show the map of the mines",
     "grab": "grab: grab, g, pick\n"+
             "    grab the item from the tile the player is standing on.\n\n"+
             "    if there is no item on the tile, nothing will be changed.\n\n"+
-            "    if there is an item on the tile and your inventory is full, you will grab the item from the tile and drop the item of the other type.",
+            "    if there is an item on the tile and your inventory is full, you will grab the item from the tile and drop an item of a separate type.",
     "use": "use: use [index] [direction], dynamite [direction], weapon [direction], mushroom [direction]\n" +
             "    use a specified item in the specified direction.\n\n"+
             "    if the item cannot be used in the direction, nothing will happen.\n\n"+
