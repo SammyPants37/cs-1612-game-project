@@ -1,5 +1,4 @@
 from enum import Enum
-from posixpath import normpath
 
 #Below is where we will import our constant values
 
