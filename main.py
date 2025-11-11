@@ -112,7 +112,7 @@ def useItem(args: list[str], playerPos: tuple[int, int]):
 def maulwurf_remains(monster: Minerals.mineralTypes):
     player.add_score(monster)
     print(ansi.italics(monster.miningDescription))
-    print(f"{ansi.b_italics("Gathered Resource")}: {ansi.g_bold(monster.description)} ({ansi.g_bold(f"+{monster.score_value}!")}) --> {ansi.cyan(f"Current Score: {player.total_score}")}")
+    print(f"{ansi.b_italics("Gathered Resource")}: {ansi.g_bold(monster.description)} ({ansi.g_bold(f"+{monster.score_value:,}!")}) --> {ansi.cyan(f"Current Score: {player.total_score:,}")}")
 
 def use_mushroom(map: list[list[Tile.Tile]], pos: tuple[int, int]) -> None: # skeleton based off of mini map
     print(ansi.italics("As the psilocybe slips down your gullet, you feel a heightened connection to the caverns around you"),
@@ -147,7 +147,7 @@ def mineTile(tilePos: tuple[int, int]):
     map[tilePos[1]][tilePos[0]].drainMineral()
     print(ansi.italics(tileMineral.miningDescription))
     print(f"{ansi.b_italics("Mined Mineral")}: {ansi.italics(ansi.green(tileMineral.description))} "
-          f"({ansi.g_bold(f"+{tileMineral.score_value}!")}) --> {ansi.cyan(f"Current Score: {player.total_score}")}")
+          f"({ansi.g_bold(f"+{tileMineral.score_value:,}!")}) --> {ansi.cyan(f"Current Score: {player.total_score:,}")}")
 
 
 def inspect_tile(tilePos: tuple[int, int]):
