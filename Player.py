@@ -19,10 +19,10 @@ def mineral_bag_amounts(self, weekday_num: int, day_of_month: int, week: int, mo
                 bonus_score += minerals.score_value
                 total_bonus += minerals.score_value
         print(ansi.italics(f"{ansi.g_bold(minerals.description)} "
-                           f"({ansi.g_bold(f"+{minerals.score_value}")}) {ansi.cyan(f"x {counter}")}" +
-                           ansi.yellow(ansi.bold_to_ital(f" BONUS! (+{int(bonus_score * bonus_mult + (counter * bonus_add))})"))))
+                           f"({ansi.g_bold(f"+{minerals.score_value:,}")}) {ansi.cyan(f"x {counter}")}" +
+                           ansi.yellow(ansi.bold_to_ital(f" BONUS! (+{int(bonus_score * bonus_mult + (counter * bonus_add)):,})"))))
     print("-------------------------")
-    return int(total_bonus * bonus_mult + (bonus_add * 14 * len(self.minerals_in_bag)))
+    return int(total_bonus * bonus_mult + (bonus_add * len(self.minerals_in_bag)))
 
 class Player:
 
@@ -44,9 +44,9 @@ class Player:
         # z_calendar = [day_of_week, week, month, day_of_month, month_name, year, weekday_num]
         print(ansi.cyan("\nCongratulations -- you successfully escaped the mountains with your life!"))
         bonus_total = mineral_bag_amounts(self, z_calendar[6], z_calendar[3], z_calendar[1], z_calendar[2], z_calendar[5])
-        print(ansi.g_bold(f"Mineral Score: {self.total_score}") +
-              ansi.yellow(ansi.bold_to_ital(f"\n+ BONUS SCORE: {bonus_total}")) +
-              ansi.cyan(ansi.bold_to_ital(f"\nFinal Score: {self.total_score + bonus_total}")))
+        print(ansi.g_bold(f"Mineral Score: {self.total_score:,}") +
+              ansi.yellow(ansi.bold_to_ital(f"\n+ BONUS SCORE: {bonus_total:,}")) +
+              ansi.cyan(ansi.bold_to_ital(f"\nFinal Score: {(self.total_score + bonus_total):,}")))
         print("-------------------------")
         if self.total_score / 2 >= 250000:
             print(ansi.italics("The mine yields to your mastery. Dwarves sing your name, carving it into stone so it may never be forgotten!"))
