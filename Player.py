@@ -1,5 +1,6 @@
 import Constants
-from Constants import Minerals, ItemLimit, Items
+from Constants import Minerals, ItemLimit, Items, zwerg_calendar_system
+import csv
 from Constants import DenominatorEventsOccur as Events_scal
 ansi: Constants.AnsiColors = Constants.AnsiColors()
 
@@ -48,6 +49,7 @@ class Player:
               ansi.yellow(ansi.bold_to_ital(f"\n+ BONUS SCORE: {bonus_total}")) +
               ansi.cyan(ansi.bold_to_ital(f"\nFinal Score: {self.total_score + bonus_total}")))
         print("-------------------------")
+        name_input(self.total_score + bonus_total)
         if self.total_score / 2 >= 250000:
             print(ansi.italics("The mine yields to your mastery. Dwarves sing your name, carving it into stone so it may never be forgotten!"))
         elif self.total_score / 2 >= 100000:
@@ -76,3 +78,35 @@ class Player:
                     return given_item #returns the different item to be dropped, not overwritten when list changed since local
         print(f"{new_item.name} grabbed, {new_item.name} dropped") #nothing is grabbed or dropped (or same thing is)
         return new_item
+
+
+def name_input(score):
+    try:
+        name_list = list(input("Input name: ").upper().strip())
+        name = name_list[0] + name_list[1] + name_list[2]
+    except IndexError:
+        print("input 3 characters, try again")
+        name_input(score)
+    else: write_score(name, score)
+
+def write_score(name, score):
+    try:
+        with open('zwerg_score.csv','r') as file:
+            reader = csv.reader(file)
+            for index, row in enumerate(reader):
+                try:
+                    if int(row[1]) >= score:
+                        print(f"high score {row[0]} {row[1]}")
+
+                    else:
+                        print(f'NEW HIGH SCORE!\n Old: {row[0]} {row[1]} -> New: {name} {score}')
+                        with open('zwerg_score.csv', 'w', newline='') as n_file:
+                            writer = csv.writer(n_file)
+                            writer.writerow([name, score])
+                except IndexError: # for Foster's special computer
+                    print(f'NEW HIGH SCORE!\n Old: {row[0]} {row[1]} -> New: {name} {score}')
+
+    except FileNotFoundError:
+        with open('zwerg_score.csv', 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([name, score])
