@@ -1,0 +1,79 @@
+# when game initializes call on the load or start function
+Constants.start_game_text()
+reload_or_start_new()
+
+# this will lead into asking the player whether they want to load or start a new game
+
+def reload_or_start_new():
+    while True: # better than recursion for handling inputs
+        answer = input("What game would you like to load? (New Game or Load Game)\n>>> ").strip().lower()
+        if answer in ("n", "new game", "new"):
+            print("---Loading New Game---")
+            return new_game_initialization() # stops loop
+        elif answer in ("l", "load game", "load", "save", "saved file", "reload", "reload file"):
+            while True:
+                file = input("Please input what file you would like to load (omit .csv)\n>>> ").strip().lower()
+                special_char_check = list(file)
+                if 0 < len(file) < 255:
+                    print("Invalid length for file, try again.")
+                else:
+                    for letter in special_char_check:
+                        if letter not in ("a", "b", "c", "d", "e", "f", "g", "h", "i",
+                                          "j", "k", "l", "m", "n", "o", "p", "q", "r",
+                                          "s", "t", "u", "v", "w", "x", "y", "z", "-", "_"):
+                            print("Invalid character in file name, try again.")
+                            break
+                    return load_game_file(file) # stops loops
+        else:
+            print('(Please input either "New" or "Load")')
+
+def new_game_initialization():
+    # include all necessary statements to start a new game
+    """ specific to new game
+    daysPassed = 0
+    map = generateMap()
+    """
+    """ for both a new game and loading a game
+    running = True
+    user_quit = False
+    player: Player.Player = Player.Player()
+    ansi: Constants.AnsiColors = Constants.AnsiColors()
+    helpMenu([""])
+    """
+
+def load_game_file(zwerg_save_slot: str):
+        try:
+            with open(f'{zwerg_save_slot}.csv', 'r') as file:
+                reader = csv.reader(file)
+                for row in reader:
+                # iterate over each row and check that the values are applicable to what they are supposed to be:
+                # if player.actions_left is a value between 1 and 3 --and-- if daysPassed is > 0 --and--
+                # if the map is within the Width and Height in Constants --and--
+                # if all the data in the map is of the correct type (bool when supposed to be True or False, etc.)
+                    else: # when the file does not meet the requirements
+                        print(f"File {zwerg_save_slot} does not meet the minimum requirements for Zwerg,
+                        \nPlease input a valid file or create a new game")
+                        reload_or_start_new()
+
+
+
+
+        except FileNotFoundError:
+            print(f'File "{zwerg_save_slot}" not found: Please input a valid file name or create a new game')
+            reload_or_start_new()
+        except PermissionError:
+            print(f'File "{zwerg_save_slot}" not available: Please input an available file name or create a new game')
+            reload_or_start_new()
+
+def save_zwerg_file():
+    while True:
+        answer = input("Enter valid file name to save the game: ").strip().lower()
+            try:
+                with open(f'{zwerg_save_slot}.csv', 'w') as file:
+                writer = csv.writer(file)
+                # save the values for map, daysPassed, and player.actions_left in the same format that they will be loaded in
+                return print("File saved successfully")
+            except PermissionError:
+                print(f'File "{zwerg_save_slot}" not available: Please input an available file name'"
+            except OSError as error:
+                print(f"Please input a valid file name (Error: {error})")
