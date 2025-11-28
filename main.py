@@ -1,20 +1,86 @@
-import random
+import random, json
 from Constants import Minerals, mapHeight, mapWidth, ItemLimit
 import Constants, Tile, Player
 
 # rest of code goes here
 
-def reload_or_start_new(): # leaving as skeleton, might want to incorporate into quit input (or its own)
+def reload_or_start_new() -> tuple[int, Player.Player, list[list[Tile.Tile]]]: # leaving as skeleton, might want to incorporate into quit input (or its own)
     answer = input("What game would you like to load? (New Game or Load Game)\n>>> ").strip().lower()
     if answer in ("n", "new game", "new"):
         print("Input accepted\n")
-        # TODO: begin initialization of game/allow initialization
+        player = Player.Player()
+        return 0, player, generateMap(player)
     elif answer in ("l", "load game", "load", "save", "saved file", "reload", "reload file"):
-        print("Reloading file not currently supported, new game initialized\n")
-        # TODO: add saved file loading
+        try:
+            player = Player.Player()
+            map: list[list[Tile.Tile]] = []
+            daysPassed = 0
+            fileName = input("what save file would you like to open?")
+            with open(fileName+".json", "r") as file:
+                reader = json.load(file)
+                daysPassed = reader["daysPassed"]
+                player.total_score = reader["player"]["total_score"]
+                player.items = [Constants.Items(item) for item in reader["player"]["items"]]
+                player.minerals_in_bag = [Minerals.mineralTypes[mineral] for mineral in reader["player"]["minerals_in_bag"]]
+                player.pos = (reader["player"]["pos"][0], reader["player"]["pos"][1])
+                player.actions_left = reader["player"]["actions_left"]
+                rowIndex, colIndex = 0, 0
+                for row in reader["map"]:
+                    # print(row)
+                    map.append([])
+                    colIndex = 0
+                    for item in row:
+                        map[rowIndex].append(Tile.Tile(
+                                                            (item["pos"][0], item["pos"][1]),
+                                                            Minerals.mineralTypes[item["resourceType"]],
+                                                            item["isExit"],
+                                                            [Minerals.mineralTypes[mineral] for mineral in item["fake_types"]]))
+                        map[rowIndex][colIndex].cavedIn = item["isCavedIn"]
+                        map[rowIndex][colIndex].isDiscovered = item["isDiscovered"]
+                        map[rowIndex][colIndex].hasMaulwurf = item["hasMaulwurf"]
+                        map[rowIndex][colIndex].setItem(Constants.Items(item["item"]))
+                        colIndex += 1
+                    rowIndex += 1
+            print(player.pos)
+            print(map)
+            return daysPassed, player, map
+        except FileNotFoundError:
+            print("invalid file. Please input a valid file in the same directory as the program.")
+            return reload_or_start_new()
+        print("something has gone wrong")
+        return reload_or_start_new()
     else:
         print('(Please input either "New" or "Load")')
-        reload_or_start_new()
+        return reload_or_start_new()
+
+def save_game(map: list[list[Tile.Tile]], player: Player.Player, daysPassed: int):
+    save = {}
+    save["player"] = {
+        "total_score": player.total_score,
+        "items":[i.value for i in player.items],
+        "minerals_in_bag": [i.name for i in player.minerals_in_bag],
+        "pos":player.pos,
+        "actions_left":player.actions_left}
+    save["daysPassed"] = daysPassed
+    save["map"] = []
+    rowIndex = 0
+    for row in map:
+        print(save)
+        save["map"].append([])
+        for item in row:
+            save["map"][rowIndex].append({    "pos":item.pos,
+                                         "resourceType":item.resourceType.name,
+                                         "fake_types": [i.name for i in item.fakeTypes],
+                                         "isCavedIn":item.cavedIn,
+                                         "isDiscovered":item.isDiscovered,
+                                         "isExit":item.isExit,
+                                         "hasMaulwurf":item.hasMaulwurf,
+                                         "item": item.item.value})
+        rowIndex += 1
+    print(save)
+    fileName = input("what do you want to name your save?")
+    with open(fileName+".json", "w") as file:
+        json.dump(save, file, indent=4, sort_keys=False)
 
 def play_again():
     answer = input("\nWould you like to play again? (Yes or No): ").strip().lower()
@@ -28,7 +94,6 @@ def drop_item(tilePos: tuple[int, int]):
     # grab_item takes the player's tile's item, spits out whatever will have to be dropped
     dropped_item: Constants.Items = player.grab_item(map[tilePos[1]][tilePos[0]].item)
     map[tilePos[1]][tilePos[0]].setItem(dropped_item) # sets the tile to the dropped item (sometimes nothing)
-
 
 def useItem(args: list[str], playerPos: tuple[int, int]):
     global player
@@ -108,7 +173,7 @@ def useItem(args: list[str], playerPos: tuple[int, int]):
         move([direction], map)
     else:
         print(ansi.b_italics("Item is not usable in that direction."))
-            
+
 def maulwurf_remains(monster: Minerals.mineralTypes):
     player.add_score(monster)
     print(ansi.italics(monster.miningDescription))
@@ -148,7 +213,6 @@ def mineTile(tilePos: tuple[int, int]):
     print(ansi.italics(tileMineral.miningDescription))
     print(f"{ansi.b_italics("Mined Mineral")}: {ansi.italics(ansi.green(tileMineral.description))} "
           f"({ansi.g_bold(f"+{tileMineral.score_value:,}!")}) --> {ansi.cyan(f"Current Score: {player.total_score:,}")}")
-
 
 def inspect_tile(tilePos: tuple[int, int]):
     true_mineral = map[tilePos[1]][tilePos[0]].resourceType  #gives the real mineral
@@ -204,7 +268,6 @@ def check_pos(pos: tuple[int, int]): # didn't want player.pos in Tile.py
                                          f"\n{ansi.italics("Thank you for playing Zwerg: Trial Beneath the Stone")}")
         else:
             move(random.choice(available_directions), map) # else a random direction is picked to move
-
 
 def occurrence_probability(numDays: int):
     possibleEvents = Constants.event_number_scaler(numDays) #sets number of events equal to the number off our formula
@@ -282,9 +345,7 @@ def infest_tile(tilePos: tuple[int, int], tries_left: int):
             else: # if it doesn't have Maulwurf
                 map[tilePos[1]][tilePos[0] - 1].setMaulwurfStatus(True) # now it does
 
-
-def generateMap() -> list[list[Tile.Tile]]:
-    global player
+def generateMap(player: Player.Player) -> list[list[Tile.Tile]]:
     map:list[list[Tile.Tile]] = []
     for h in range(Constants.mapHeight):
         map.append([])
@@ -297,13 +358,12 @@ def generateMap() -> list[list[Tile.Tile]]:
     map[0][playerX].isDiscovered = True
     return map
 
-
-def showMap(map: list[list[Tile.Tile]]) -> None:
+def showMap(map: list[list[Tile.Tile]], playerPos: tuple[int, int]) -> None:
     workingRow = 0
     for row in map:
         line = ""
         for item in row:
-            if item.pos == player.pos:
+            if item.pos == playerPos:
                 line += ansi.blue("P ") # makes P (the player) blue
             else:
                 line += str(item) + " "
@@ -329,7 +389,7 @@ def show_mini_map(map: list[list[Tile.Tile]], pos: tuple[int, int]) -> None: # s
     for row in map[row_bounds[0]:row_bounds[1]]:
         line = "    "
         for item in row[item_bounds[0]:item_bounds[1]]: # mimics what I did for row
-            if item.pos == player.pos:
+            if item.pos == pos:
                 line += ansi.blue("P ") # makes P (the player) blue
             else:
                 line += str(item) + " "
@@ -351,13 +411,11 @@ def helpMenu(args: list[str]):
             for command in Constants.commandAliases: # wish I didn't have to iterate over the aliases but its the best solution at the moment
                 for item in Constants.commandAliases[command]:
                     if args[0] == item:
-                       print(ansi.italics(Constants.helpText[command])) 
+                       print(ansi.italics(Constants.helpText[command]))
                        return
             print(ansi.italics(f"no such help page. Help pages include: {", ".join(Constants.helpText.keys())}"))
 
-
-def move(args: list[str], map: list[list[Tile.Tile]]):
-    global player
+def move(args: list[str], map: list[list[Tile.Tile]], player: Player.Player):
     arg = args[0]
     if len(args) > 1:
         print(ansi.italics("all arguments past the first one have been discarded"))
@@ -405,8 +463,7 @@ def showInventory():
     for i in range(len(player.items)):
         print(f"{i+1}: {player.items[i].name}")
 
-
-def handleInput(input: str):
+def handleInput(input: str, player: Player.Player, map: list[list[Tile.Tile]]):
     global running, user_quit
     command = input.split(" ")[0].lower().strip()
     arguments = input.split(" ")[1:] # args will be passed to each command when they're implemented
@@ -421,10 +478,11 @@ def handleInput(input: str):
         case "maulwurf" | "read" | "continue":
             Constants.entry_counter += Constants.maulwurf_description(Constants.entry_counter)
         case "move":
-            move(arguments, map)
+            move(arguments, map, player)
             show_mini_map(map, player.pos)
         case "n" | "s" | "e" | "w" | "north" | "south" | "east" | "west":
-            move(list(command), map)
+            move(list(command), map, player)
+            print(player.pos)
             show_mini_map(map, player.pos)
         case "mine" | "m":
             player.actions_left -= 1
@@ -432,7 +490,7 @@ def handleInput(input: str):
         case "inspect" | "l" | "look":
             inspect_tile(player.pos)
         case "compass" | "map" | "check" | "c":
-            showMap(map)
+            showMap(map, player.pos)
         case "grab" | "pick" | "g":
             drop_item(player.pos)
         case "dynamite" | "d":
@@ -474,6 +532,8 @@ def handleInput(input: str):
         case "z": # got sick of spamming mine
             if Constants.devMode:
                 player.actions_left -= 12
+        case "save":
+            save_game(map, player, daysPassed)
         case _:
             print(ansi.b_italics(f"mine game: {ansi.bold_to_ital(command)}: not found."))
 
@@ -486,11 +546,12 @@ while True:
     daysPassed = 0
     player: Player.Player = Player.Player()
     ansi: Constants.AnsiColors = Constants.AnsiColors()
-    map = generateMap()
+    map = generateMap(player)
     running = True
     user_quit = False
 
-    # reload_or_start_new() #TODO: uncomment after completing menu
+    daysPassed, player, map = reload_or_start_new()
+    # reload_or_start_new() # TODO: uncomment after completing menu
     helpMenu([""])
 
     # game loop
@@ -501,7 +562,7 @@ while True:
             check_pos(player.pos) # checks if Maulwurf or CaveIn occurred on the player's tile, kicking them to a new tile if so
             if player.actions_left == 0: break
             command = input(">>> ")
-            handleInput(command)
+            handleInput(command, player, map)
         if running:
             occurrence_probability(daysPassed)
             daysPassed += 1
@@ -510,7 +571,7 @@ while True:
             print(ansi.italics(f"\n{ansi.cyan(f"Week {z_calendar[1]}")}") + ansi.italics(f": {z_calendar[0]}, {ansi.cyan(f"Day {z_calendar[3]}")} ") +
                            ansi.italics(f"of {z_calendar[4]} ({ansi.cyan(f"{z_calendar[2]}/{z_calendar[3]}/{z_calendar[5]}")}" + ansi.italics(")")))
             print(ansi.italics("As you go to sleep for the evening, you hear the rumbles of change in the mines"))
-    
+
     # After game ends, ask if player wants to play again (unless user quit)
     if user_quit:
         break
