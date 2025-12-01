@@ -95,8 +95,7 @@ def drop_item(tilePos: tuple[int, int]):
     dropped_item: Constants.Items = player.grab_item(map[tilePos[1]][tilePos[0]].item)
     map[tilePos[1]][tilePos[0]].setItem(dropped_item) # sets the tile to the dropped item (sometimes nothing)
 
-def useItem(args: list[str], playerPos: tuple[int, int]):
-    global player
+def useItem(args: list[str], player: Player.Player):
     itemIndex = args[0]
 
     if itemIndex.isdigit():
@@ -129,36 +128,36 @@ def useItem(args: list[str], playerPos: tuple[int, int]):
 
     match direction:
         case "n" | "north":
-            if playerPos[1] > 0:
-                if map[playerPos[1] - 1][playerPos[0]].is_usable(item):
+            if player.pos[1] > 0:
+                if map[player.pos[1] - 1][player.pos[0]].is_usable(item):
                     if item == Constants.Items.dynamite:
-                        map[playerPos[1] - 1][playerPos[0]].setCavedIn(False)
+                        map[player.pos[1] - 1][player.pos[0]].setCavedIn(False)
                     elif item == Constants.Items.weapon:
-                        map[playerPos[1] - 1][playerPos[0]].setMaulwurfStatus(False)
+                        map[player.pos[1] - 1][player.pos[0]].setMaulwurfStatus(False)
                     itemUsable = True
         case "s" | "south":
-            if playerPos[1] < mapHeight - 1:
-                if map[playerPos[1] + 1][playerPos[0]].is_usable(item):
+            if player.pos[1] < mapHeight - 1:
+                if map[player.pos[1] + 1][player.pos[0]].is_usable(item):
                     if item == Constants.Items.dynamite:
-                        map[playerPos[1] + 1][playerPos[0]].setCavedIn(False)
+                        map[player.pos[1] + 1][player.pos[0]].setCavedIn(False)
                     elif item == Constants.Items.weapon:
-                        map[playerPos[1] + 1][playerPos[0]].setMaulwurfStatus(False)
+                        map[player.pos[1] + 1][player.pos[0]].setMaulwurfStatus(False)
                     itemUsable = True
         case "e" | "east":
-            if playerPos[0] < mapWidth - 1:
-                if map[playerPos[1]][playerPos[0] + 1].is_usable(item):
+            if player.pos[0] < mapWidth - 1:
+                if map[player.pos[1]][player.pos[0] + 1].is_usable(item):
                     if item == Constants.Items.dynamite:
-                        map[playerPos[1]][playerPos[0] + 1].setCavedIn(False)
+                        map[player.pos[1]][player.pos[0] + 1].setCavedIn(False)
                     elif item == Constants.Items.weapon:
-                        map[playerPos[1]][playerPos[0] + 1].setMaulwurfStatus(False)
+                        map[player.pos[1]][player.pos[0] + 1].setMaulwurfStatus(False)
                     itemUsable = True
         case "w" | "west":
-            if playerPos[0] > 0:
-                if map[playerPos[1]][playerPos[0] - 1].is_usable(item):
+            if player.pos[0] > 0:
+                if map[player.pos[1]][player.pos[0] - 1].is_usable(item):
                     if item == Constants.Items.dynamite:
-                        map[playerPos[1]][playerPos[0] - 1].setCavedIn(False)
+                        map[player.pos[1]][player.pos[0] - 1].setCavedIn(False)
                     elif item == Constants.Items.weapon:
-                        map[playerPos[1]][playerPos[0] - 1].setMaulwurfStatus(False)
+                        map[player.pos[1]][player.pos[0] - 1].setMaulwurfStatus(False)
                     itemUsable = True
         case _:
             print(ansi.b_italics("Please input a valid direction. Valid directions include "
@@ -170,7 +169,7 @@ def useItem(args: list[str], playerPos: tuple[int, int]):
         print(ansi.b_italics(f"Used {item.name},"), end=" ")
         player.items[itemIndex] = Constants.Items.nothing
         player.actions_left -= 1
-        move([direction], map)
+        move([direction], map, player)
     else:
         print(ansi.b_italics("Item is not usable in that direction."))
 
@@ -233,7 +232,7 @@ def inspect_tile(tilePos: tuple[int, int]):
         print("While gleaming the mine for potential minerals, I found a "
               f"{ansi.b_bold(map[tilePos[1]][tilePos[0]].item.name)} that I could grab if space allows")
 
-def check_pos(pos: tuple[int, int]): # didn't want player.pos in Tile.py
+def check_pos(pos: tuple[int, int], player: Player.Player): # didn't want player.pos in Tile.py
     global running
     if map[pos[1]][pos[0]].isExit: # if the player is on the exit
         answer = input(f"{ansi.cyan("Do you want to escape the mountains?")} "
@@ -267,7 +266,7 @@ def check_pos(pos: tuple[int, int]): # didn't want player.pos in Tile.py
             print(ansi.red("YOU DIED") + f" -- {ansi.cyan("Score: 0")}"
                                          f"\n{ansi.italics("Thank you for playing Zwerg: Trial Beneath the Stone")}")
         else:
-            move(random.choice(available_directions), map) # else a random direction is picked to move
+            move(random.choice(available_directions), map, player) # else a random direction is picked to move
 
 def occurrence_probability(numDays: int):
     possibleEvents = Constants.event_number_scaler(numDays) #sets number of events equal to the number off our formula
