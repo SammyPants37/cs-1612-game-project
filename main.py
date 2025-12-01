@@ -41,8 +41,6 @@ def reload_or_start_new() -> tuple[int, Player.Player, list[list[Tile.Tile]]]: #
                         map[rowIndex][colIndex].setItem(Constants.Items(item["item"]))
                         colIndex += 1
                     rowIndex += 1
-            print(player.pos)
-            print(map)
             return daysPassed, player, map
         except FileNotFoundError:
             print("invalid file. Please input a valid file in the same directory as the program.")
@@ -65,7 +63,6 @@ def save_game(map: list[list[Tile.Tile]], player: Player.Player, daysPassed: int
     save["map"] = []
     rowIndex = 0
     for row in map:
-        print(save)
         save["map"].append([])
         for item in row:
             save["map"][rowIndex].append({    "pos":item.pos,
@@ -77,7 +74,6 @@ def save_game(map: list[list[Tile.Tile]], player: Player.Player, daysPassed: int
                                          "hasMaulwurf":item.hasMaulwurf,
                                          "item": item.item.value})
         rowIndex += 1
-    print(save)
     fileName = input("what do you want to name your save?")
     with open(fileName+".json", "w") as file:
         json.dump(save, file, indent=4, sort_keys=False)
@@ -232,9 +228,9 @@ def inspect_tile(tilePos: tuple[int, int]):
         print("While gleaming the mine for potential minerals, I found a "
               f"{ansi.b_bold(map[tilePos[1]][tilePos[0]].item.name)} that I could grab if space allows")
 
-def check_pos(pos: tuple[int, int], player: Player.Player): # didn't want player.pos in Tile.py
+def check_pos(player: Player.Player): # didn't want player.pos in Tile.py
     global running
-    if map[pos[1]][pos[0]].isExit: # if the player is on the exit
+    if map[player.pos[1]][player.pos[0]].isExit: # if the player is on the exit
         answer = input(f"{ansi.cyan("Do you want to escape the mountains?")} "
                        f"({ansi.blue("Yes")} or {ansi.blue("No")}): ").strip().lower()
         if answer in ("yes", "y", "escape", "exit"):
@@ -245,20 +241,20 @@ def check_pos(pos: tuple[int, int], player: Player.Player): # didn't want player
             print(ansi.italics("You decide to continue mining... hopefully your greed doesn't get the best of you"))
         else:
             print(f'Please input a valid answer. Enter "{ansi.cyan("Exit")}" to try again')
-    elif map[pos[1]][pos[0]].hasMaulwurf or map[pos[1]][pos[0]].cavedIn: #checks if the tile is valid
-        if map[pos[1]][pos[0]].cavedIn: # gives feedback if it is caved in
+    elif map[player.pos[1]][player.pos[0]].hasMaulwurf or map[player.pos[1]][player.pos[0]].cavedIn: #checks if the tile is valid
+        if map[player.pos[1]][player.pos[0]].cavedIn: # gives feedback if it is caved in
             print(f"Ow! The cavern you are in {ansi.red("collapsed!")}")
-        elif map[pos[1]][pos[0]].hasMaulwurf: # if it is not caved in, gives feedback that there are Maulwurf
+        elif map[player.pos[1]][player.pos[0]].hasMaulwurf: # if it is not caved in, gives feedback that there are Maulwurf
             print(f"Oh no! An overwhelming horde of {ansi.yellow("Maulwurf")} flooded into the cave!")
 
         available_directions = []  # below checks to see if a given direction is valid, appending it if it is
-        if pos[1] - 1 >= 0 and not (map[pos[1] - 1][pos[0]].cavedIn or map[pos[1] - 1][pos[0]].hasMaulwurf):
+        if player.pos[1] - 1 >= 0 and not (map[player.pos[1] - 1][player.pos[0]].cavedIn or map[player.pos[1] - 1][player.pos[0]].hasMaulwurf):
             available_directions.append("n")
-        if pos[1] + 1 < mapHeight and not (map[pos[1] + 1][pos[0]].cavedIn or map[pos[1] + 1][pos[0]].hasMaulwurf):
+        if player.pos[1] + 1 < mapHeight and not (map[player.pos[1] + 1][player.pos[0]].cavedIn or map[player.pos[1] + 1][player.pos[0]].hasMaulwurf):
             available_directions.append("s")
-        if pos[0] + 1 < mapWidth and not (map[pos[1]][pos[0] + 1].cavedIn or map[pos[1]][pos[0] + 1].hasMaulwurf):
+        if player.pos[0] + 1 < mapWidth and not (map[player.pos[1]][player.pos[0] + 1].cavedIn or map[player.pos[1]][player.pos[0] + 1].hasMaulwurf):
             available_directions.append("e")
-        if pos[1] - 1 >= 0 and not (map[pos[1]][pos[0] - 1].cavedIn or map[pos[1]][pos[0] - 1].hasMaulwurf):
+        if player.pos[1] - 1 >= 0 and not (map[player.pos[1]][player.pos[0] - 1].cavedIn or map[player.pos[1]][player.pos[0] - 1].hasMaulwurf):
             available_directions.append("w")
         if len(available_directions) == 0: # if there are no valid directions
             running = False
@@ -496,25 +492,25 @@ def handleInput(input: str, player: Player.Player, map: list[list[Tile.Tile]]):
             try:
                 itemIndex = player.items.index(Constants.Items.dynamite)
                 arguments.insert(0, str(itemIndex + 1))
-                useItem(arguments, player.pos)
+                useItem(arguments, player)
             except ValueError:
                 print(ansi.b_italics("no dynamite in inventory"))
         case "weapon" | "fight" | "f" | "battle" | "b" | "kill":
             try:
                 itemIndex = player.items.index(Constants.Items.weapon)
                 arguments.insert(0, str(itemIndex + 1))
-                useItem(arguments, player.pos)
+                useItem(arguments, player)
             except ValueError:
                 print(ansi.b_italics("no weapon in inventory"))
         case "mushroom" | "shroom" | "psilocybe" | "conecsiemuer" | "p":
             try:
                 itemIndex = player.items.index(Constants.Items.mushroom)
                 arguments.insert(0, str(itemIndex + 1))
-                useItem(arguments, player.pos)
+                useItem(arguments, player)
             except ValueError:
                 print(ansi.b_italics("no mushroom in inventory"))
         case "use":
-            useItem(arguments, player.pos)
+            useItem(arguments, player)
         case "help":
             # show the help menu when the help command is run
             helpMenu(arguments)
@@ -558,7 +554,7 @@ while True:
         player.actions_left += Constants.NumPlayerMoves #refunds 3 actions
         # run player moves
         while player.actions_left > 0:
-            check_pos(player.pos) # checks if Maulwurf or CaveIn occurred on the player's tile, kicking them to a new tile if so
+            check_pos(player) # checks if Maulwurf or CaveIn occurred on the player's tile, kicking them to a new tile if so
             if player.actions_left == 0: break
             command = input(">>> ")
             handleInput(command, player, map)
