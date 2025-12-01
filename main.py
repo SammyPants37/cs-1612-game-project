@@ -393,12 +393,12 @@ def show_mini_map(map: list[list[Tile.Tile]], pos: tuple[int, int]) -> None: # s
 
 def helpMenu(args: list[str]):
     if args[0] == "": # show the main help menu if no arguement is supplied
-        alignmentString = "{:<10s} {:<20s} {:<10s}"
+        alignmentString = "{:<15s} {:<20s} {:<10s}"
         print(ansi.italics("Welcome to the game! Here are some inputs you can use"))
         print(ansi.italics(alignmentString.format("Rules", "Move (n, s, e, w)", "Grab") + "\n" +
               alignmentString.format("Objective", "Mine", "Use (dynamite, weapon, mushroom)" + "\n" +
               alignmentString.format("Map", "Inspect", "Inventory") + "\n" +
-              alignmentString.format("Help (command)", "Quit (game, quit)", ""))))
+              alignmentString.format("Help (command)", "Quit (game, quit)", "save"))))
     else:
         if args[0] in Constants.helpText:
             print(ansi.italics(Constants.helpText[args[0]]))

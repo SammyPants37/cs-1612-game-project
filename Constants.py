@@ -241,13 +241,15 @@ helpText: dict[str, str] = {
             "    use a specified item in the specified direction.\n\n"+
             "    if the item cannot be used in the direction, nothing will happen.\n\n"+
             "    Commands that are the item name only take a direction and attempt to use the item they are named after in the specified dierection.",
-    "help": "help: help [command]\n" + 
+    "help": "help: help [command]\n" +
             "    If run with no command input, shows most available commands.\n\n" +
             "    If run with a command input, shows the help page for that command",
-    "inventory": "inventory: inventory, i\n" + 
+    "inventory": "inventory: inventory, i\n" +
                 "    Show the inventory of the player.",
-    "quit": "quit: quit [game/quit/yes/y/q]\n" + 
-            "    quits the game if given a confirmation."}
+    "quit": "quit: quit [game/quit/yes/y/q]\n" +
+            "    quits the game if given a confirmation.",
+    "save": "save: save\n" +
+            "    save the game. Will prompt for a save name after running."}
 
 commandAliases: dict[str, list[str]] = {"rules": ["r"],
                                         "objective": ["lore", "o"],
