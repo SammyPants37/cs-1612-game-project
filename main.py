@@ -171,18 +171,7 @@ def inspect_tile(tilePos: tuple[int, int]):
 
 def check_pos(pos: tuple[int, int]): # didn't want player.pos in Tile.py
     global running
-    if map[pos[1]][pos[0]].isExit: # if the player is on the exit
-        answer = input(f"{ansi.cyan("Do you want to escape the mountains?")} "
-                       f"({ansi.blue("Yes")} or {ansi.blue("No")}): ").strip().lower()
-        if answer in ("yes", "y", "escape", "exit"):
-            player.exit_message(z_calendar)
-            running = False
-            player.actions_left = 0
-        elif answer in ("no", "n", "nope", "nada", "stay"):
-            print(ansi.italics("You decide to continue mining... hopefully your greed doesn't get the best of you"))
-        else:
-            print(f'Please input a valid answer. Enter "{ansi.cyan("Exit")}" to try again')
-    elif map[pos[1]][pos[0]].hasMaulwurf or map[pos[1]][pos[0]].cavedIn: #checks if the tile is valid
+    if map[pos[1]][pos[0]].hasMaulwurf or map[pos[1]][pos[0]].cavedIn: #checks if the tile is valid
         if map[pos[1]][pos[0]].cavedIn: # gives feedback if it is caved in
             print(f"Ow! The cavern you are in {ansi.red("collapsed!")}")
         elif map[pos[1]][pos[0]].hasMaulwurf: # if it is not caved in, gives feedback that there are Maulwurf
@@ -204,6 +193,17 @@ def check_pos(pos: tuple[int, int]): # didn't want player.pos in Tile.py
                                          f"\n{ansi.italics("Thank you for playing Zwerg: Trial Beneath the Stone")}")
         else:
             move(random.choice(available_directions), map) # else a random direction is picked to move
+    elif map[pos[1]][pos[0]].isExit:  # if the player is on the exit
+        answer = input(f"{ansi.cyan("Do you want to escape the mountains?")} "
+                       f"({ansi.blue("Yes")} or {ansi.blue("No")}): ").strip().lower()
+        if answer in ("yes", "y", "escape", "exit"):
+            player.exit_message(z_calendar)
+            running = False
+            player.actions_left = 0
+        elif answer in ("no", "n", "nope", "nada", "stay"):
+            print(ansi.italics("You decide to continue mining... hopefully your greed doesn't get the best of you"))
+        else:
+            print(f'Please input a valid answer. Enter "{ansi.cyan("Exit")}" to try again')
 
 
 def occurrence_probability(numDays: int):
