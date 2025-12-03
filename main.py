@@ -550,7 +550,7 @@ while True:
 
     # game loop
     while running:
-        if player.actions_left == 0:
+        if player.actions_left <= 0:
             player.actions_left += Constants.NumPlayerMoves #refunds 3 actions
         # run player moves
         while player.actions_left > 0:
