@@ -477,7 +477,6 @@ def handleInput(input: str, player: Player.Player, map: list[list[Tile.Tile]]):
             show_mini_map(map, player.pos)
         case "n" | "s" | "e" | "w" | "north" | "south" | "east" | "west":
             move(list(command), map, player)
-            print(player.pos)
             show_mini_map(map, player.pos)
         case "mine" | "m":
             player.actions_left -= 1
@@ -551,7 +550,8 @@ while True:
 
     # game loop
     while running:
-        player.actions_left += Constants.NumPlayerMoves #refunds 3 actions
+        if player.actions_left == 0:
+            player.actions_left += Constants.NumPlayerMoves #refunds 3 actions
         # run player moves
         while player.actions_left > 0:
             check_pos(player) # checks if Maulwurf or CaveIn occurred on the player's tile, kicking them to a new tile if so
