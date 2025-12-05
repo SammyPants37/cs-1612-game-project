@@ -90,6 +90,20 @@ def drop_item(tilePos: tuple[int, int]):
     # grab_item takes the player's tile's item, spits out whatever will have to be dropped
     dropped_item: Constants.Items = player.grab_item(map[tilePos[1]][tilePos[0]].item)
     map[tilePos[1]][tilePos[0]].setItem(dropped_item) # sets the tile to the dropped item (sometimes nothing)
+    if dropped_item is None:
+        print(ansi.b_italics("Your inventory is full! Which item would you like to drop?"))
+        showInventory()
+        while True:
+            try:
+                choice = input("Enter the number of the item to drop (1-4): ").strip()
+                item_index = int(choice) - 1
+                if 0 <= item_index < Constants.ItemLimit:
+                    dropped_item = player.grab_item(new_item, replace_index=item_index)
+                    break
+                else:
+                    print(ansi.b_italics(f"Please enter a number between 1 and {Constants.ItemLimit}"))
+            except ValueError:
+                print(ansi.b_italics("Please enter a valid number"))
 
 def useItem(args: list[str], player: Player.Player):
     itemIndex = args[0]
