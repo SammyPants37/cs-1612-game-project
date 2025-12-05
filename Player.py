@@ -77,7 +77,7 @@ class Player:
                     self.items[replace_index] = new_item
                     print(f"{new_item.name} grabbed, {dropped_item.name} dropped")
                     return dropped_item
-                return None
+                    return None
         print(f"{new_item.name} grabbed, {new_item.name} dropped") #nothing is grabbed or dropped (or same thing is)
         return new_item
 
