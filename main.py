@@ -95,7 +95,7 @@ def drop_item(tilePos: tuple[int, int]):
         showInventory()
         while True:
             try:
-                choice = input("Enter the number of the item to drop (1-4): ").strip()
+                choice = input(f"Enter the number of the item to drop (1-{Constants.ItemLimit}): ").strip()
                 item_index = int(choice) - 1
                 if 0 <= item_index < Constants.ItemLimit:
                     dropped_item = player.grab_item(new_item, replace_index=item_index)
