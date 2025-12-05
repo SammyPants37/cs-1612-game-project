@@ -64,18 +64,20 @@ class Player:
     def setPos(self, pos: tuple[int, int]):
         self.pos = pos
 
-    def grab_item(self, new_item: Constants.Items):
+    def grab_item(self, new_item: Constants.Items, replace_index: int = None):
         if new_item.value != 0: #if you aren't trying to grab nothing
             for given_item in self.items: #iterates over all items in inventory
                 if given_item.value == 0: #if the item you are on is nothing
                     self.items[self.items.index(given_item)] = new_item # 1st nothing in the list is replaced by the new item
                     print(f"{new_item.name} grabbed")
                     return Constants.Items.nothing #returns nothing to be dropped on the tile
-            for given_item in self.items: #iterates over items in inventory again
-                if given_item != new_item: #finds if there is an item different from the grabbed one
-                    self.items[self.items.index(given_item)] = new_item # 1st different item in the list is replaced by the new item
-                    print(f"{new_item.name} grabbed, {given_item.name} dropped")
-                    return given_item #returns the different item to be dropped, not overwritten when list changed since local
+            if replace_index is not None:
+                if 0 <= replace_index < len(self.items):
+                    dropped_item = self.items[replace_index]
+                    self.items[replace_index] = new_item
+                    print(f"{new_item.name} grabbed, {dropped_item.name} dropped")
+                    return dropped_item
+                return None
         print(f"{new_item.name} grabbed, {new_item.name} dropped") #nothing is grabbed or dropped (or same thing is)
         return new_item
 
