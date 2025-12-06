@@ -72,12 +72,11 @@ class Player:
                     print(f"{new_item.name} grabbed")
                     return Constants.Items.nothing #returns nothing to be dropped on the tile
             if replace_index is not None:
-                if 0 <= replace_index < len(self.items):
-                    dropped_item = self.items[replace_index]
-                    self.items[replace_index] = new_item
-                    print(f"{new_item.name} grabbed, {dropped_item.name} dropped")
-                    return dropped_item
-                    return None
+                dropped_item = self.items[replace_index]
+                self.items[replace_index] = new_item
+                print(f"{new_item.name} grabbed, {dropped_item.name} dropped")
+                return dropped_item    
+            return None
 
 def name_input(score):
     try:
