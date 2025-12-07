@@ -77,6 +77,8 @@ class Player:
                 print(f"{new_item.name} grabbed, {dropped_item.name} dropped")
                 return dropped_item    
             return None
+        print(f"{new_item.name} grabbed, {new_item.name} dropped")  # nothing is grabbed or dropped (or same thing is)
+        return new_item
 
 def name_input(score):
     try:
