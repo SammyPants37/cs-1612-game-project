@@ -97,7 +97,7 @@ def drop_item(tilePos: tuple[int, int]):
                 choice = input(f"Enter the number of the item to drop (1-{Constants.ItemLimit}): ").strip()
                 item_index = int(choice) - 1
                 if 0 <= item_index < Constants.ItemLimit:
-                    dropped_item = player.grab_item(new_item, replace_index=item_index)
+                    dropped_item = player.grab_item(map[tilePos[1]][tilePos[0]].item, replace_index=item_index)
                     break
                 else:
                     print(ansi.b_italics(f"Please enter a number between 1 and {Constants.ItemLimit}"))
