@@ -5,6 +5,7 @@ from Constants import DenominatorEventsOccur as Events_scal
 ansi: Constants.AnsiColors = Constants.AnsiColors()
 
 def mineral_bag_amounts(self, weekday_num: int, day_of_month: int, week: int, month: int, year: int):
+    """print the current bonus scores"""
     print(f"------{ansi.bold_to_ital("Mineral Tally") + ansi.reset()}------")
     bonus_mult = (month / Events_scal) * (week + (19 * (year - 625177))) * (Events_scal ** (year - 625178))
     bonus_add = (weekday_num * day_of_month)
@@ -26,8 +27,7 @@ def mineral_bag_amounts(self, weekday_num: int, day_of_month: int, week: int, mo
     return int(total_bonus * bonus_mult + (bonus_add * len(self.minerals_in_bag)))
 
 class Player:
-
-
+    """the main player class. contains all the data on the player"""
     def __init__(self):
         self.total_score: int = 0
         self.items: list[Items] = []
@@ -38,11 +38,12 @@ class Player:
         self.actions_left: int = 0
 
     def add_score(self, new_mineral: Minerals.mineralTypes):
+        """add a mineral (and associated score) to the player"""
         self.minerals_in_bag.append(new_mineral) #adds mineral to bag
         self.total_score += new_mineral.score_value #adds mineral's score to total
 
     def exit_message(self, z_calendar: list):
-        # z_calendar = [day_of_week, week, month, day_of_month, month_name, year, weekday_num]
+        """show the final message at the end of the game"""
         print(ansi.cyan("\nCongratulations -- you successfully escaped the mountains with your life!"))
         bonus_total = mineral_bag_amounts(self, z_calendar[6], z_calendar[3], z_calendar[1], z_calendar[2], z_calendar[5])
         print(ansi.g_bold(f"Mineral Score: {self.total_score:,}") +
@@ -59,12 +60,13 @@ class Player:
         else:
             print(ansi.italics("You have crawled out with bones intact, but the mine still stands, unbroken and mocking your retreat."))
 
-    # TODO: save and show game stats and prompt to "play again?"
 
     def setPos(self, pos: tuple[int, int]):
+        """set the player's postion"""
         self.pos = pos
 
     def grab_item(self, new_item: Constants.Items, replace_index: int = None):
+        """grab an item from a tile"""
         if new_item.value != 0: #if you aren't trying to grab nothing
             for given_item in self.items: #iterates over all items in inventory
                 if given_item.value == 0: #if the item you are on is nothing
@@ -75,7 +77,7 @@ class Player:
                 dropped_item = self.items[replace_index]
                 self.items[replace_index] = new_item
                 print(f"{new_item.name} grabbed, {dropped_item.name} dropped")
-                return dropped_item    
+                return dropped_item
             return None
         print(f"{new_item.name} grabbed, {new_item.name} dropped")  # nothing is grabbed or dropped (or same thing is)
         return new_item

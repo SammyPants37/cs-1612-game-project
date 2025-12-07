@@ -43,6 +43,7 @@ def event_number_scaler(x: int) -> int: # formula for scaling how many events wi
 event_weights = (5,4) # weights for choosing which event occurs. (infest, cave in)
 
 class AnsiColors:
+    """easy way to add color to text. Does not work on some python runners like python IDLE"""
     def red(self, text):
         return f"\033[31m{text}\033[0m"
     def green(self, text):
@@ -78,11 +79,13 @@ ansi: AnsiColors = AnsiColors()
 
 
 class Minerals:
+    """all information on minerals such as their description, value, and spawning weights"""
     weights = [(1, 4, 5, 6, 8, 17, 18, 30, 40, 50, 110, 175, 9, 0), # real weights, ordered the same as mineralTypes(Enum)
                (0, 2, 3, 5, 7, 12, 15, 35, 40, 48, 110, 225, 0, 0)] # fake weights for map generation
 
     # Enum classes allow the value and name of a function to be used in place of a function
     class mineralTypes(Enum):
+        """actual mineral enum"""
         unminable = (0, "Worthless Rock", 0, "Congratulations! You mined a worthless rock!")
         diamond = (1, "Diamond", 100000, "Your eyes glimmer at the sight of a room laden with diamonds. You stuff your bag full of them until your hands bleed.")
         ruby = (2, "Ruby", 85000, "Your lantern lights up a crimson hue in a crevice to your side. Preparing for the worst, you investigate,\nleading your bag to become loaded with rubies.")
@@ -110,20 +113,24 @@ class Minerals:
             print(Minerals.mineralTypes.diamond.description) # Diamond
             print(Minerals.mineralTypes.diamond.score_value) # 100000 """
 
+# various constants
 devMode = False # added devMode to check if things are working as expected easier
 ItemLimit = 4
 NumPlayerMoves = 3
 DenominatorEventsOccur = 6 # in case we would like to change the 1/6th chance they occur separately
 
+# item enum
 class Items(Enum):
     nothing = 0
     dynamite = 1
     weapon = 2
     mushroom = 3
 
+# weights for item spawning
 def item_weights(): # to make items more or less common
     return [38,5,5,2] # nothing, dynamite, weapon, mushroom
 
+# extra bits and bobs added to the main map command
 mapExtras = [
     "    Legend:",
     f"    ?: unexplored tile {"N":^15}",
@@ -140,6 +147,7 @@ mapExtras = [
 mapWidth = 25 # must be greater than 5
 mapHeight = 25 # must be greater than 5
 
+# game objective
 def game_objective():
     print(f"{ansi.blue("You are an aspiring dwarf")} native to the Great Northern Mountains, being born\n"
     f'and raised in “Zwergberg”, the dwarven village {ansi.blue("located in the most Northern part")}\n'
@@ -152,6 +160,7 @@ def game_objective():
     f"have decided to {ansi.cyan("head South to escape")} the mine to the sky plane before it is too\n"
     f"late! Of course stuffing your pockets full of {ansi.green("valuable minerals")} on the way out.\n")
 
+# rules of the game
 def game_rules():
     print(f"{ansi.blue(f"Every turn the player gets {NumPlayerMoves} major actions")}, but use them wisely! After each turn there\n"
           f"is a chance for a {ansi.red("disastrous event")} to occur: either a tile will {ansi.red("cave in")} or the {ansi.yellow("Maulwurf")}\n"
@@ -169,6 +178,7 @@ def game_rules():
           f"{ansi.yellow("aren't always fair")}... {ansi.blue("only one")} of those {ansi.green("minerals")} listed {ansi.blue("are real")} after all, and it's probably {ansi.green("coal")}.\n"
           f"{ansi.blue("Once")} ({ansi.red("if")}) you make it to the {ansi.cyan("exit")}, input {ansi.cyan("Escape to exit the mountains")} with your {ansi.green("fortune")}!")
 
+# maulwurf lore. split into chucks for readability
 entry_counter = 0
 def maulwurf_description(entry_num):
     description_list = ("A Maulwurf is a large, monstrous creature at least twice the size of man, where the\naverage size of an adult is a little bigger than that of an adult gorilla.",
@@ -199,6 +209,7 @@ def maulwurf_description(entry_num):
         return -22
     return 1
 
+# text for the beginning of the game
 def start_game_text():
     print(f" --- {ansi.blue(ansi.bold_to_ital("Zwerg: Trial Beneath the Stone"))} --- \n"
           f"You descend into the mine seeking {ansi.green("riches and glory")}.\n"
@@ -212,7 +223,7 @@ def start_game_text():
           f" --- {ansi.blue(ansi.bold_to_ital("May Fortunes be for the Living"))} ---\n")
 
 
-
+# dictionary with all the help text for the help commadnd
 helpText: dict[str, str] = {
     "rules": "rules: rules, r\n" +
             "    show the rules of the game",
@@ -251,6 +262,7 @@ helpText: dict[str, str] = {
     "save": "save: save\n" +
             "    save the game. Will prompt for a save name after running."}
 
+# aliases for the commands in the help function
 commandAliases: dict[str, list[str]] = {"rules": ["r"],
                                         "objective": ["lore", "o"],
                                         "maulwurf": ["read"],

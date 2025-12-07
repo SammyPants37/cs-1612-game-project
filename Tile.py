@@ -9,7 +9,7 @@ def mineralRandomizer(wanted_list_size: int) -> list[Minerals.mineralTypes]:  # 
 
 
 class Tile():
-
+    """main class for a tile. one instance of this is created for every tile on the map"""
     def __init__(self, pos, resourceType: Minerals.mineralTypes, isExit: bool, fakeTypes: list[Minerals.mineralTypes]) -> None:
         self.pos: tuple[int, int] = pos
         self.resourceType: Minerals.mineralTypes = resourceType
@@ -21,23 +21,29 @@ class Tile():
         self.item: Constants.Items = Constants.Items.nothing
 
     def make_discovered(self):
+        """discover a tile"""
         self.isDiscovered = True
 
     def setItem(self, item: Constants.Items):
+        """set the item on a tile"""
         self.item = item
-    
+
     def setCavedIn(self, isCavedIn: bool):
+        """set the caved in status"""
         self.cavedIn = isCavedIn
         if isCavedIn: # if the tile is caved in
             self.hasMaulwurf = not isCavedIn # Maulwurf are now killed
 
     def drainMineral(self):
+        """remove the mineral from the tile"""
         self.resourceType = Minerals.mineralTypes.unminable
 
     def setMaulwurfStatus(self, hasMaulwurf: bool):
+        """set the maulwurf status of the tile"""
         self.hasMaulwurf = hasMaulwurf
 
     def is_usable(self, item: Constants.Items) -> bool: # checks for Maulwurf or CaveIn depending on item inputted
+        """check if an item is usable on this tile"""
         if item == Constants.Items.dynamite:
             return self.cavedIn # returns whether it is cavedIn or not
         elif item == Constants.Items.weapon:
@@ -46,6 +52,7 @@ class Tile():
 
     @override
     def __str__(self) -> str:
+        """return a single character when str(tile) is called"""
         if self.isExit:
             return ansi.cyan("E") # returns E in cyan
         else:
